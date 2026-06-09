@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANA AI Studio — Primentoring.AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#FAFAF8;--white:#FFFFFF;--surface:#F5F3F0;--surface2:#EDEAE5;
+  --border:#E8E4DE;--border2:#D8D2CA;
+  --purple:#6B4FA0;--purple-light:#8B6FC0;--purple-pale:#F0ECF8;
+  --purple-mid:#E0D6F0;--purple-glow:rgba(107,79,160,0.12);--purple-deep:#4A3070;
+  --ink:#1A1614;--ink-soft:#4A4440;--ink-muted:#8A8280;--ink-faint:#B8B2AA;
+  --teal:#2D8A7C;--teal-pale:#E8F5F2;
+  --amber:#B8720A;--amber-pale:#FDF4E7;
+  --rose:#A84060;--rose-pale:#FAEEF2;
+  --tech:#2860B0;--tech-pale:#EAF0FA;
+  --radius:14px;--radius-sm:8px;--radius-xs:6px;
+  --shadow-sm:0 1px 3px rgba(26,22,20,.06),0 2px 8px rgba(26,22,20,.04);
+  --shadow:0 2px 8px rgba(26,22,20,.08),0 8px 24px rgba(26,22,20,.06);
+  --shadow-lg:0 8px 32px rgba(26,22,20,.12),0 24px 64px rgba(26,22,20,.08);
+  --shadow-purple:0 4px 20px rgba(107,79,160,.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.sidebar{width:248px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:2px 0 16px rgba(26,22,20,.04)}
+.logo-wrap{padding:32px 24px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.logo-wrap::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--purple-pale),transparent 70%);pointer-events:none}
+.logo-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light) 0%,var(--purple-deep) 100%);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:white;margin-bottom:12px;box-shadow:var(--shadow-purple);position:relative}
+.logo-avatar::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(107,79,160,.2);animation:pulse-ring 3s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.12);opacity:0}}
+.logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);letter-spacing:-.01em;line-height:1.2}
+.logo-name em{font-style:italic;color:var(--purple)}
+.logo-domain{font-size:11px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.nav{padding:16px 12px;flex:1}
+.nav-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);padding:0 10px;margin-bottom:6px;margin-top:16px}
+.nav-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--ink-muted);font-size:14px;font-weight:400;transition:all .2s cubic-bezier(.4,0,.2,1);margin-bottom:2px;position:relative}
+.nav-item .ni{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .2s}
+.nav-item:hover{background:var(--surface);color:var(--ink)}
+.nav-item:hover .ni{transform:scale(1.1)}
+.nav-item.active{background:var(--purple-pale);color:var(--purple);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--purple);border-radius:0 3px 3px 0}
+.api-wrap{padding:16px;border-top:1px solid var(--border);background:var(--surface)}
+.api-lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);margin-bottom:8px}
+.api-field{display:flex;align-items:center;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-xs);overflow:hidden;transition:border-color .15s}
+.api-field:focus-within{border-color:var(--purple-light)}
+.api-field input{flex:1;padding:8px 10px;background:none;border:none;outline:none;font-size:12px;color:var(--ink);font-family:'DM Sans',sans-serif}
+.api-field input::placeholder{color:var(--ink-faint)}
+.api-eye{padding:0 10px;cursor:pointer;color:var(--ink-faint);font-size:14px;user-select:none;transition:color .15s}
+.api-eye:hover{color:var(--purple)}
+.api-status{font-size:11px;margin-top:5px;color:var(--ink-faint)}
+.api-status.ok{color:var(--teal)}.api-status.err{color:var(--rose)}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.panel{display:none}
+.panel.active{display:block;animation:panelIn .3s cubic-bezier(.4,0,.2,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.page-hero{padding:48px 52px 36px;border-bottom:1px solid var(--border);background:var(--white);position:relative;overflow:hidden}
+.page-hero::after{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--purple-pale),transparent 65%);pointer-events:none}
+.page-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);background:var(--purple-pale);padding:4px 12px;border-radius:20px;margin-bottom:14px;border:1px solid var(--purple-mid)}
+.page-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15;margin-bottom:8px}
+.page-title em{font-style:italic;color:var(--purple)}
+.page-sub{font-size:15px;color:var(--ink-muted);font-weight:300;max-width:480px}
+.page-body{padding:32px 52px 52px}
+.news-ticker{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,var(--purple-pale),var(--tech-pale));border:1px solid var(--purple-mid);border-radius:var(--radius-sm);margin-bottom:20px;overflow:hidden}
+.news-ticker-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);white-space:nowrap;flex-shrink:0}
+.news-ticker-scroll{flex:1;overflow:hidden;position:relative}
+.news-ticker-text{font-size:12px;color:var(--ink-soft);font-weight:300;white-space:nowrap;animation:ticker 32s linear infinite}
+@keyframes ticker{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+.news-refresh-btn{flex-shrink:0;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:500;color:var(--purple);border:1px solid var(--purple-mid);background:white;cursor:pointer;transition:all .15s}
+.news-refresh-btn:hover{background:var(--purple-pale)}
+.filter-tabs{display:flex;gap:0;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;box-shadow:var(--shadow-sm);overflow-x:auto}
+.ftab{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:400;color:var(--ink-muted);transition:all .22s cubic-bezier(.4,0,.2,1);white-space:nowrap}
+.ftab:hover{color:var(--ink);background:var(--surface)}
+.ftab.active{background:var(--white);color:var(--ink);font-weight:500;box-shadow:var(--shadow-sm)}
+.ftab.active.career{color:var(--purple);background:var(--purple-pale)}
+.ftab.active.life{color:var(--teal);background:var(--teal-pale)}
+.ftab.active.mindset{color:var(--amber);background:var(--amber-pale)}
+.ftab.active.tech{color:var(--tech);background:var(--tech-pale)}
+.ftab.active.promo{color:var(--purple-deep);background:var(--purple-pale)}
+.ftab-icon{font-size:16px}
+.ftab-count{font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--ink-muted)}
+.ftab.active.career .ftab-count{background:var(--purple-mid);color:var(--purple)}
+.ftab.active.life .ftab-count{background:#C8EDE8;color:var(--teal)}
+.ftab.active.mindset .ftab-count{background:#F5E0C0;color:var(--amber)}
+.ftab.active.tech .ftab-count{background:#C8D8F0;color:var(--tech)}
+.ftab.active.promo .ftab-count{background:var(--purple-mid);color:var(--purple-deep)}
+.trend-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.trend-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:flex-start;gap:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.trend-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:all .2s}
+.trend-card:hover{border-color:var(--purple-light);box-shadow:var(--shadow);transform:translateY(-1px)}
+.trend-card:hover::before{background:var(--purple-light)}
+.trend-card.sel{border-color:var(--purple);background:var(--purple-pale);box-shadow:var(--shadow-purple);transform:translateY(-1px)}
+.trend-card.sel::before{background:var(--purple)}
+.trend-card.news-card{border-left:3px solid var(--tech)}
+.trend-card.news-card::before{background:var(--tech)}
+.t-num{font-size:12px;font-weight:600;color:var(--ink-faint);min-width:24px;padding-top:2px;letter-spacing:.05em}
+.trend-card.sel .t-num{color:var(--purple)}
+.t-body{flex:1}
+.t-title{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:8px;line-height:1.4}
+.trend-card.sel .t-title{color:var(--purple-deep)}
+.t-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.t-news-hook{font-size:12px;color:var(--ink-muted);font-weight:300;margin-top:5px;font-style:italic;line-height:1.4}
+.pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.02em}
+.pill-ig{background:var(--rose-pale);color:var(--rose)}
+.pill-tt{background:var(--surface2);color:var(--ink-soft)}
+.pill-career{background:var(--purple-pale);color:var(--purple)}
+.pill-life{background:var(--teal-pale);color:var(--teal)}
+.pill-mindset{background:var(--amber-pale);color:var(--amber)}
+.pill-promo{background:var(--purple-mid);color:var(--purple-deep)}
+.pill-tech{background:var(--tech-pale);color:var(--tech)}
+.pill-live{background:#FFF0E0;color:#B85C00;border:1px solid #F0C080}
+.t-stat{font-size:11px;color:var(--ink-faint)}
+.t-arrow{color:var(--ink-faint);font-size:18px;padding-top:1px;transition:all .2s;align-self:center}
+.trend-card:hover .t-arrow,.trend-card.sel .t-arrow{transform:translateX(3px);color:var(--purple)}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:16px;box-shadow:var(--shadow-sm);transition:border-color .2s}
+.card:hover{border-color:var(--border2)}
+.card-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-muted);margin-bottom:16px}
+.fmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fmt-opt{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px 12px;text-align:center;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);background:var(--surface)}
+.fmt-opt:hover{border-color:var(--purple-light);background:var(--purple-pale);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.fmt-opt.sel{border-color:var(--purple);background:var(--purple-pale);box-shadow:0 0 0 3px rgba(107,79,160,.1);transform:translateY(-2px)}
+.fmt-e{font-size:24px;margin-bottom:6px;display:block;transition:transform .2s}
+.fmt-opt:hover .fmt-e{transform:scale(1.15)}
+.fmt-l{font-size:12px;color:var(--ink-muted);font-weight:400}
+.fmt-opt.sel .fmt-l{color:var(--purple);font-weight:500}
+.tone-row{display:flex;gap:8px;flex-wrap:wrap}
+.tone-chip{padding:8px 16px;border-radius:24px;font-size:13px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--ink-muted);transition:all .2s cubic-bezier(.4,0,.2,1);font-weight:400}
+.tone-chip:hover{border-color:var(--purple-light);color:var(--purple);transform:translateY(-1px)}
+.tone-chip.sel{background:var(--purple);color:white;border-color:var(--purple);font-weight:500;box-shadow:var(--shadow-purple);transform:translateY(-1px)}
+.field{margin-bottom:16px}.field:last-child{margin-bottom:0}
+.field-label{font-size:12px;font-weight:500;color:var(--ink-soft);margin-bottom:6px;display:block;letter-spacing:.01em}
+select,input[type=text],textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--white);outline:none;transition:all .15s;font-weight:300;appearance:none;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B8B2AA' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+select:focus,input[type=text]:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(107,79,160,.08)}
+textarea{resize:vertical;min-height:88px;line-height:1.65}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sel-preview{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;background:var(--purple-pale);border-radius:var(--radius-sm);border:1.5px solid var(--purple-mid);margin-bottom:24px}
+.sel-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:6px;box-shadow:0 0 0 3px rgba(107,79,160,.2)}
+.sel-preview-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:3px}
+.sel-preview-text{font-size:14px;color:var(--purple-deep);font-weight:300;line-height:1.4}
+.rules-card{background:linear-gradient(135deg,var(--purple-pale) 0%,#FDF8FF 100%);border:1.5px solid var(--purple-mid);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px}
+.rules-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.rule-item{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-soft);font-weight:300;line-height:1.55;margin-bottom:7px}
+.rule-item:last-child{margin-bottom:0}
+.rule-dot{width:5px;height:5px;border-radius:50%;background:var(--purple-light);flex-shrink:0;margin-top:7px}
+.btn{padding:11px 22px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:var(--white);color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .2s cubic-bezier(.4,0,.2,1);display:inline-flex;align-items:center;gap:8px;letter-spacing:.01em}
+.btn:hover{border-color:var(--purple-light);color:var(--purple);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn-purple{background:var(--purple);border-color:var(--purple);color:white;box-shadow:var(--shadow-purple)}
+.btn-purple:hover{background:var(--purple-deep);border-color:var(--purple-deep);color:white;box-shadow:0 6px 24px rgba(107,79,160,.35);transform:translateY(-2px)}
+.btn-purple:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-teal{border-color:var(--teal);color:var(--teal)}
+.btn-teal:hover{background:var(--teal-pale);color:var(--teal);border-color:var(--teal)}
+.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;align-items:center}
+.prompt-wrap{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.prompt-sec{padding:22px 28px;border-bottom:1px solid var(--border);transition:background .15s}
+.prompt-sec:last-child{border-bottom:none}
+.prompt-sec:hover{background:var(--bg)}
+.prompt-sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.prompt-sec-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);flex:1}
+.prompt-sec-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-pale);color:var(--purple);font-weight:500;border:1px solid var(--purple-mid)}
+.prompt-sec-body{font-size:14px;line-height:1.9;color:var(--ink-soft);white-space:pre-wrap;font-weight:300}
+.prompt-sec-body.script{font-family:'Playfair Display',serif;font-size:17px;color:var(--ink);line-height:2;font-style:italic;font-weight:400}
+.news-context{background:var(--tech-pale);border:1px solid #B0C8E8;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;font-size:12px;color:var(--tech);font-weight:400;line-height:1.6}
+.news-context-title{font-weight:600;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.loader{text-align:center;padding:100px 20px;display:none}
+.loader-orb{width:56px;height:56px;border-radius:50%;margin:0 auto 24px;background:linear-gradient(135deg,var(--purple-light),var(--purple-deep));animation:orb-pulse 1.8s ease-in-out infinite;box-shadow:var(--shadow-purple)}
+@keyframes orb-pulse{0%,100%{transform:scale(.9);opacity:.7}50%{transform:scale(1.1);opacity:1}}
+.loader-msg{font-size:15px;color:var(--ink-muted);font-weight:300;font-family:'Playfair Display',serif;font-style:italic}
+.empty{text-align:center;padding:100px 20px}
+.empty-glyph{font-family:'Playfair Display',serif;font-size:64px;color:var(--border2);margin-bottom:16px;display:block;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.empty-t{font-size:17px;color:var(--ink-muted);font-weight:300}
+.empty-s{font-size:14px;color:var(--ink-faint);margin-top:6px}
+.history-item{padding:18px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s}
+.history-item:last-child{border-bottom:none}
+.history-item:hover .h-title{color:var(--purple)}
+.h-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;transition:color .15s;line-height:1.4}
+.h-meta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-faint)}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:white;padding:12px 24px;border-radius:24px;font-size:14px;opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:9999;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+@media(max-width:800px){.sidebar{display:none}.page-hero{padding:32px 24px 24px}.page-body{padding:24px}.two-col{grid-template-columns:1fr}.fmt-grid{grid-template-columns:repeat(2,1fr)}.page-title{font-size:28px}.filter-tabs{gap:4px}.ftab{padding:8px 10px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-avatar">D</div>
+      <div class="logo-name">DANA <em>AI</em> Studio</div>
+      <div class="logo-domain">primentoring.ai</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Workflow</div>
+      <div class="nav-item active" onclick="nav('trends')"><span class="ni">◈</span> Trend Radar</div>
+      <div class="nav-item" onclick="nav('customize')"><span class="ni">✦</span> Customize</div>
+      <div class="nav-item" onclick="nav('output')"><span class="ni">◎</span> HeyGen Prompt</div>
+      <div class="nav-label">Manage</div>
+      <div class="nav-item" onclick="nav('history')"><span class="ni">◷</span> History</div>
+      <div class="nav-item" onclick="nav('settings')"><span class="ni">⊙</span> DANA Profile</div>
+    </nav>
+    <div class="api-wrap">
+      <div class="api-lbl">Anthropic API Key</div>
+      <div class="api-field">
+        <input type="password" id="apiKey" placeholder="sk-ant-..." oninput="checkKey()">
+        <span class="api-eye" onclick="toggleKey()">👁</span>
+      </div>
+      <div class="api-status" id="keyStatus">Required for AI generation</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- TREND RADAR -->
+    <div id="panel-trends" class="panel active">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 01</div>
+        <div class="page-title">Trend <em>Radar</em></div>
+        <div class="page-sub">Choose a content category, then select a trending template.</div>
+      </div>
+      <div class="page-body">
+        <div class="news-ticker">
+          <span class="news-ticker-label">⚡ Live</span>
+          <div class="news-ticker-scroll"><span class="news-ticker-text" id="ticker-text">Loading…</span></div>
+          <button class="news-refresh-btn" onclick="fetchLiveNews()">↺ Refresh news</button>
+        </div>
+        <div class="filter-tabs">
+          <div class="ftab active career" onclick="switchPillar('career',this)"><span class="ftab-icon">💼</span> Career <span class="ftab-count" id="count-career">5</span></div>
+          <div class="ftab life" onclick="switchPillar('life',this)"><span class="ftab-icon">🌿</span> Life <span class="ftab-count" id="count-life">4</span></div>
+          <div class="ftab mindset" onclick="switchPillar('mindset',this)"><span class="ftab-icon">🧠</span> Mindset <span class="ftab-count" id="count-mindset">4</span></div>
+          <div class="ftab tech" onclick="switchPillar('tech',this)"><span class="ftab-icon">⚡</span> Tech & AI <span class="ftab-count" id="count-tech">5</span></div>
+          <div class="ftab promo" onclick="switchPillar('promo',this)"><span class="ftab-icon">✦</span> Primentoring <span class="ftab-count" id="count-promo">5</span></div>
+        </div>
+        <div class="trend-grid" id="trend-list"></div>
+        <div id="trends-loader" class="loader" style="padding:40px 0"><div class="loader-orb" style="width:36px;height:36px"></div><div class="loader-msg">Refreshing…</div></div>
+        <div class="btn-row">
+          <button class="btn btn-purple" onclick="goCustomize()">Customize selected →</button>
+          <button class="btn" onclick="fetchAllTrends()">↺ Refresh all with AI</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMIZE -->
+    <div id="panel-customize" class="panel">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 02</div>
+        <div class="page-title">Customize <em>DANA</em></div>
+        <div class="page-sub">Set the format, tone, and visual direction before generating.</div>
+      </div>
+      <div class="page-body">
+        <div class="rules-card">
+          <div class="rules-title">🎬 Production Rules</div>
+          <div class="rule-item"><div class="rule-dot"></div>Continuous dynamic motion — no static poses, no frozen frames</div>
+          <div class="rule-item"><div class="rule-dot"></div>Multi-angle variety: close-up, half-body, and full-body</div>
+          <div class="rule-item"><div class="rule-dot"></div>Real, directional, cinematic lighting that shifts with each scene</div>
+          <div class="rule-item"><div class="rule-dot"></div>Text overlays on solid colour band at bottom only — never on DANA's face</div>
+          <div class="rule-item"><div class="rule-dot"></div>Dynamic video assets only · Hook in first 5 seconds · Story-driven</div>
+        </div>
+        <div class="sel-preview">
+          <div class="sel-preview-dot"></div>
+          <div>
+            <div class="sel-preview-label">Selected trend</div>
+            <div class="sel-preview-text" id="preview-text">No trend selected — go to Trend Radar first</div>
+          </div>
+        </div>
+        <div id="news-context-box" style="display:none" class="news-context">
+          <div class="news-context-title">📰 Live news context</div>
+          <div id="news-context-text"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Video format</div>
+          <div class="fmt-grid">
+            <div class="fmt-opt sel" onclick="pickFmt(this,'Talking head — DANA continuously moving, shifting posture and gestures, varying between close-up and medium framing')"><span class="fmt-e">🎙</span><span class="fmt-l">Talking Head</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Lifestyle montage — DANA moving through real environments, observational camera, no direct address')"><span class="fmt-e">🎬</span><span class="fmt-l">Lifestyle Montage</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'POV reaction — DANA responding mid-conversation, expressive natural gestures, active movement throughout')"><span class="fmt-e">💬</span><span class="fmt-l">POV / Reaction</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Day-in-the-life — DANA moving through morning or evening routines, mix of full-body and close-up shots')"><span class="fmt-e">☀️</span><span class="fmt-l">Day in Life</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Before & after — two contrasting dynamic scene sets in continuous motion')"><span class="fmt-e">🔄</span><span class="fmt-l">Before / After</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Voiceover montage — DANA moving through intimate scenes, cinematic observational camera')"><span class="fmt-e">🌙</span><span class="fmt-l">Voiceover</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">DANA's tone</div>
+          <div class="tone-row">
+            <div class="tone-chip sel" onclick="pickTone(this)">Warm & Direct</div>
+            <div class="tone-chip" onclick="pickTone(this)">Bold & Empowering</div>
+            <div class="tone-chip" onclick="pickTone(this)">Vulnerable & Real</div>
+            <div class="tone-chip" onclick="pickTone(this)">Playful & Witty</div>
+            <div class="tone-chip" onclick="pickTone(this)">Expert & Confident</div>
+            <div class="tone-chip" onclick="pickTone(this)">Quiet & Reflective</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Scene & styling</div>
+          <div class="two-col">
+            <div class="field">
+              <label class="field-label">Setting</label>
+              <select id="setting">
+                <option>Modern home office — warm directional natural light, plants softly blurred</option>
+                <option>Minimal studio — clean warm white backdrop, single key light</option>
+                <option>Cosy living room — evening amber lamp light, bookshelves in bokeh</option>
+                <option>Morning kitchen — soft daylight through window, coffee steam rising</option>
+                <option>Outdoor café — dappled sunlight, gentle ambient motion</option>
+                <option>Sleek co-working space — cool morning light, glass and warm wood</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label">Outfit</label>
+              <select id="outfit">
+                <option>Elevated casual — relaxed blazer over simple top, soft neutral tones</option>
+                <option>Power look — structured blazer, rich deep colour</option>
+                <option>Morning soft — oversized linen or knit, lived-in luxury</option>
+                <option>Business chic — tailored but approachable, warm jewel tone</option>
+                <option>Off-duty polished — silky top, well-cut trousers</option>
+              </select>
+            </div>
+          </div>
+          <div class="field" style="margin-top:4px">
+            <label class="field-label">Hair & Makeup</label>
+            <select id="makeup">
+              <option>Natural glam — luminous skin, defined brows, nude lip, hair down with wave</option>
+              <option>Editorial — bold warm lip, minimal eyes, hair sleek or half-up</option>
+              <option>No-makeup makeup — dewy fresh skin, mascara only, hair loosely up</option>
+              <option>Polished professional — full brows, warm eye, rose lip, hair styled</option>
+              <option>Morning real — tinted moisturiser, hair loosely piled, authentically imperfect</option>
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Additional direction (optional)</div>
+          <textarea id="notes" placeholder="e.g. Reference the 97% satisfaction rate… tie to latest AI news…"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-purple" onclick="generatePrompt()">✦ Generate HeyGen Prompt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div id="panel-output" class="panel">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 03</div>
+        <div class="page-title">HeyGen <em>Prompt</em></div>
+        <div class="page-sub">All motion, lighting, and text rules applied. Ready to paste.</div>
+      </div>
+      <div class="page-body">
+        <div id="output-loader" class="loader"><div class="loader-orb"></div><div class="loader-msg" id="loader-msg">DANA is finding her angle…</div></div>
+        <div id="output-empty" class="empty"><span class="empty-glyph">◎</span><div class="empty-t">No prompt yet</div><div class="empty-s">Select a trend and click Generate</div></div>
+        <div id="output-block" style="display:none">
+          <div class="prompt-wrap">
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Scene & Motion Direction</div><span class="prompt-sec-tag">🎬 Motion · Lighting · Angles</span></div><div class="prompt-sec-body" id="o-scene"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Wardrobe & Beauty</div></div><div class="prompt-sec-body" id="o-styling"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Script / Voiceover</div><span class="prompt-sec-tag">~60 seconds</span></div><div class="prompt-sec-body script" id="o-script"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Delivery & Motion Notes</div></div><div class="prompt-sec-body" id="o-delivery"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Text Overlay & Graphics</div><span class="prompt-sec-tag">No text on face</span></div><div class="prompt-sec-body" id="o-text"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Caption & Hashtags</div></div><div class="prompt-sec-body" id="o-caption"></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-purple" onclick="copyAll()">⎘ Copy full prompt</button>
+            <button class="btn btn-teal" onclick="saveHistory()">+ Save to history</button>
+            <button class="btn" onclick="nav('trends')">New content</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="panel-history" class="panel">
+      <div class="page-hero"><div class="page-eyebrow">Archive</div><div class="page-title">Prompt <em>History</em></div><div class="page-sub">Saved locally in your browser.</div></div>
+      <div class="page-body"><div class="card" id="history-list" style="padding:8px 20px"></div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="panel-settings" class="panel">
+      <div class="page-hero"><div class="page-eyebrow">Configuration</div><div class="page-title">DANA <em>Profile</em></div><div class="page-sub">Her identity and rules — applied to every prompt.</div></div>
+      <div class="page-body">
+        <div class="card">
+          <div class="card-label">Identity</div>
+          <div class="two-col">
+            <div class="field"><label class="field-label">Name</label><input type="text" id="s-name" value="DANA AI"></div>
+            <div class="field"><label class="field-label">Brand</label><input type="text" id="s-brand" value="Primentoring.AI"></div>
+          </div>
+          <div class="field"><label class="field-label">HeyGen Avatar Name</label><input type="text" id="s-avatar" value="DANA — saved avatar in HeyGen"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Personality & Voice</div>
+          <div class="field"><label class="field-label">Bio & Backstory</label>
+            <textarea id="s-bio" style="min-height:110px">DANA is a Life & Career Coach and the AI Mentor at Primentoring.AI. She has navigated corporate burnout, career pivots, and built her own path. She speaks to ambitious women across all career stages. Warm, direct, real. She represents a platform with 100+ elite mentors from Google, Apple, Meta, Amazon, NASA — 97% client satisfaction across 130 countries.</textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Content Pillars</div>
+          <div class="field"><textarea id="s-pillars" style="min-height:70px">Career growth, promotions, boundaries, routines, self-worth, toxic workplaces, financial independence, mindset, authentic leadership, AI & future of work, mentorship access, career transitions</textarea></div>
+        </div>
+        <div class="btn-row"><button class="btn btn-purple" onclick="saveSettings()">Save profile</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── API CALL — routes through Vercel proxy ────
+async function callAPI(payload) {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) throw new Error('Enter your API key first');
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ apiKey: key, ...payload })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(typeof data.error === 'string' ? data.error : JSON.stringify(data.error));
+  return data;
+}
+
+// ── STATE ─────────────────────────────────────
+const S = {
+  currentPillar: 'career',
+  selected: null, selectedTrendData: null, selectedPillar: null,
+  format: 'Talking head — DANA continuously moving, shifting posture and gestures, varying between close-up and medium framing',
+  tone: 'Warm & Direct',
+  prompt: null, liveNewsContext: '',
+  history: JSON.parse(localStorage.getItem('dana_history') || '[]'),
+  trends: {
+    career: [
+      { title: '"Things that quietly changed my career (no grind required)"', platform:'TikTok', engagement:'1.5M+ views', hook:'Nobody told me these. I found out the slow way.' },
+      { title: '"Why the most qualified person rarely gets promoted"', platform:'TikTok', engagement:'2.2M+ views', hook:'Competence gets you in the room. This gets you the title.' },
+      { title: '"Unpopular opinion: rest is part of the strategy"', platform:'TikTok', engagement:'1.1M+ views', hook:'You\'re not falling behind. You\'re recharging. There\'s a difference.' },
+      { title: '"The one email habit that changed how my manager sees me"', platform:'Instagram', engagement:'65k+ likes', hook:'One small shift. Completely different perception.' },
+      { title: '"Green flags in a job offer most people overlook"', platform:'Instagram', engagement:'88k+ likes', hook:'The salary isn\'t the only number that matters.' },
+    ],
+    life: [
+      { title: '"What my Sunday looks like now vs. a year ago"', platform:'Instagram', engagement:'70k+ likes', hook:'A year ago Sundays felt like dread. Now they feel like mine.' },
+      { title: '"Hallelujah for the small things"', platform:'Instagram', engagement:'95k+ likes', hook:'The unremarkable moments are the ones holding everything together.' },
+      { title: '"The morning I stopped performing productivity"', platform:'TikTok', engagement:'900k+ views', hook:'The most productive morning I ever had looked nothing like a routine.' },
+      { title: '"Things I stopped doing when I finally felt at peace"', platform:'Instagram', engagement:'112k+ likes', hook:'Peace wasn\'t something I found. It was something I stopped avoiding.' },
+    ],
+    mindset: [
+      { title: '"Remember who you are" — values before the next goal', platform:'Instagram', engagement:'80k+ likes', hook:'Before you chase the next thing — remember who you already are.' },
+      { title: '"The burnout-to-boundary pipeline"', platform:'TikTok', engagement:'2M+ views', hook:'I didn\'t burn out because I worked too hard. I burned out because I couldn\'t say no.' },
+      { title: '"The version of you that existed before the world had opinions"', platform:'TikTok', engagement:'1.7M+ views', hook:'She\'s still in there. She\'s been waiting.' },
+      { title: '"Soft life doesn\'t mean what you think it means"', platform:'TikTok', engagement:'1.3M+ views', hook:'I used to think this was about doing less. It\'s actually about doing differently.' },
+    ],
+    tech: [
+      { title: '"AI skills now command 56% higher salaries — here\'s what that means for you"', platform:'TikTok', engagement:'Trending', hook:'The pay gap isn\'t between industries anymore. It\'s between skill sets.', isLive:true, newsRef:'PwC 2025: workers with AI skills earn 56% more on average' },
+      { title: '"Companies are laying off with AI then rehiring — what\'s really happening"', platform:'TikTok', engagement:'Trending', hook:'The tech layoff story everyone\'s telling is missing the second half.', isLive:true, newsRef:'Rest of World 2026: 80k+ tech jobs cut, rehiring wave expected as AI limitations emerge' },
+      { title: '"The EU just regulated AI at work — most employees don\'t know it yet"', platform:'Instagram', engagement:'Trending', hook:'If your company uses AI to evaluate you, new rules just changed the game.', isLive:true, newsRef:'EU AI Act May 2026: workplace AI evaluation tools classified "high risk"' },
+      { title: '"Entry-level jobs are disappearing. Here\'s what I\'d do instead."', platform:'TikTok', engagement:'Trending', hook:'The pathway I would take if I was starting my career right now.', isLive:true, newsRef:'Rest of World 2026: entry-level pathways narrowing as AI automates early-career tasks' },
+      { title: '"AI engineer: #1 fastest-growing job of 2026 — is it for you?"', platform:'Instagram', engagement:'Trending', hook:'LinkedIn just named it. Here\'s what no one tells you about actually getting there.', isLive:true, newsRef:'LinkedIn 2026: AI engineer #1 fastest-growing US job title; postings up 143% YoY' },
+    ],
+    promo: [
+      { title: '"The mentor I never had" — introducing Primentoring AI', platform:'TikTok', engagement:'Product', hook:'The access I didn\'t have early in my career — you can have it today.' },
+      { title: '"2am career spiral" — DANA as always-on AI Mentor', platform:'TikTok', engagement:'Product', hook:'When the spiral starts — I\'m already there.' },
+      { title: '"What 10,000 career conversations taught me"', platform:'Instagram', engagement:'Product', hook:'The people who move fast? They don\'t move alone.' },
+      { title: '"97% satisfaction — here\'s what they all say"', platform:'TikTok', engagement:'Product', hook:'It\'s not about the platform. It\'s what happens when you stop guessing.' },
+      { title: '"What if you could ask anyone anything?"', platform:'Instagram', engagement:'Product', hook:'The question you\'ve been sitting on — it\'s worth asking.' },
+    ]
+  }
+};
+
+// ── NAV ───────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));
+  const ids=['trends','customize','output','history','settings'];
+  document.querySelectorAll('.nav-item')[ids.indexOf(id)].classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='history') renderHistory();
+}
+
+// ── TICKER ────────────────────────────────────
+function initTicker() {
+  const headlines = [
+    'PwC 2025: Workers with AI skills earn 56% more on average  ·  ',
+    'LinkedIn 2026: AI Engineer is the #1 fastest-growing job title in the US (+143% YoY)  ·  ',
+    'EU AI Act update May 2026: workplace AI evaluation tools now "high risk"  ·  ',
+    'Rest of World: 80k+ tech jobs cut in 2025 — rehiring wave expected  ·  ',
+    'WEF 2025: Healthcare, education & creative roles to grow 15–25% through 2030  ·  ',
+    'Gloat May 2026: Only 14% of orgs have agentic AI solutions ready to deploy  ·  ',
+  ];
+  document.getElementById('ticker-text').textContent = headlines.join('  ');
+}
+
+// ── TRENDS ────────────────────────────────────
+function updateCounts() {
+  ['career','life','mindset','tech','promo'].forEach(p=>{
+    const el=document.getElementById('count-'+p);
+    if(el) el.textContent=S.trends[p].length;
+  });
+}
+
+const cardAnim=document.createElement('style');
+cardAnim.textContent='@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(cardAnim);
+
+function switchPillar(pillar,el) {
+  S.currentPillar=pillar;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderTrends();
+}
+
+function renderTrends() {
+  const list=document.getElementById('trend-list');
+  const items=S.trends[S.currentPillar]||[];
+  list.style.opacity='0'; list.style.transform='translateY(6px)';
+  setTimeout(()=>{
+    list.innerHTML=items.map((t,i)=>{
+      const gid=S.currentPillar+'_'+i;
+      const sel=S.selected===gid;
+      return `<div class="trend-card${sel?' sel':''}${t.isLive?' news-card':''}" onclick="selectTrend('${gid}',${i})" style="animation:cardIn .2s ${i*.05}s both ease-out">
+        <div class="t-num">${t.isLive?'🔴':String(i+1).padStart(2,'0')}</div>
+        <div class="t-body">
+          <div class="t-title">${t.title}</div>
+          <div class="t-meta">
+            <span class="pill ${t.platform==='Instagram'?'pill-ig':'pill-tt'}">${t.platform}</span>
+            <span class="pill pill-${S.currentPillar}">${S.currentPillar}</span>
+            ${t.isLive?'<span class="pill pill-live">Live news</span>':''}
+            <span class="t-stat">${t.engagement}</span>
+          </div>
+          ${t.isLive&&t.newsRef?`<div class="t-news-hook">📰 ${t.newsRef}</div>`:''}
+        </div>
+        <div class="t-arrow">→</div>
+      </div>`;
+    }).join('');
+    list.style.transition='all .25s ease';
+    list.style.opacity='1'; list.style.transform='translateY(0)';
+  },80);
+}
+
+function selectTrend(gid,i) {
+  S.selected=gid; S.selectedTrendData=S.trends[S.currentPillar][i]; S.selectedPillar=S.currentPillar;
+  document.getElementById('preview-text').textContent=S.selectedTrendData.title.replace(/"/g,'');
+  const ncBox=document.getElementById('news-context-box');
+  const ncText=document.getElementById('news-context-text');
+  if(S.selectedTrendData.isLive&&S.selectedTrendData.newsRef){ncText.textContent=S.selectedTrendData.newsRef;ncBox.style.display='block';}
+  else{ncBox.style.display='none';}
+  renderTrends();
+}
+
+function goCustomize(){if(!S.selectedTrendData)selectTrend(S.currentPillar+'_0',0);nav('customize');}
+
+// ── FETCH LIVE NEWS ───────────────────────────
+async function fetchLiveNews() {
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key){toast('Enter your API key first');return;}
+  const btn=document.querySelector('.news-refresh-btn');
+  btn.textContent='…';
+  try {
+    const data = await callAPI({
+      model:'claude-sonnet-4-20250514', max_tokens:900,
+      tools:[{type:'web_search_20250305',name:'web_search'}],
+      system:'Search for latest AI and career news today. Return ONLY JSON: {"ticker":"short headline string","trends":[{"title":string,"platform":"Instagram"|"TikTok","engagement":"Trending","hook":string,"isLive":true,"newsRef":string}]} — 5 items. No markdown.',
+      messages:[{role:'user',content:'Search for top AI and workplace career news today June 9 2026. Generate 5 content ideas for DANA, an AI Life & Career Coach at Primentoring.AI, based on real news found.'}]
+    });
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    if(parsed.trends){S.trends.tech=parsed.trends;updateCounts();if(S.currentPillar==='tech')renderTrends();document.getElementById('ticker-text').textContent=(parsed.ticker||'')+' · '+document.getElementById('ticker-text').textContent;toast('Live news loaded ✓');}
+  } catch(e){toast('Using cached trends');}
+  btn.textContent='↺ Refresh news';
+}
+
+async function fetchAllTrends() {
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key){toast('Enter your API key first');return;}
+  document.getElementById('trends-loader').style.display='block';
+  document.getElementById('trend-list').style.display='none';
+  try {
+    const data = await callAPI({
+      model:'claude-sonnet-4-20250514', max_tokens:1800,
+      system:'Generate trending social media content. Return ONLY JSON object with keys career,life,mindset,tech,promo. Each = array of 4-5 objects: {title,platform:"Instagram"|"TikTok",engagement,hook}. tech must reference current AI news June 2026. No markdown.',
+      messages:[{role:'user',content:'Fresh trending templates for DANA, AI Life & Career Coach at Primentoring.AI. June 9 2026. All English.'}]
+    });
+    const raw=data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(raw);
+    Object.keys(parsed).forEach(k=>{if(S.trends[k])S.trends[k]=parsed[k];});
+    updateCounts(); renderTrends(); toast('All trends refreshed ✓');
+  } catch(e){toast('Error: '+e.message);}
+  finally{document.getElementById('trends-loader').style.display='none';document.getElementById('trend-list').style.display='grid';}
+}
+
+// ── CUSTOMIZE ─────────────────────────────────
+function pickFmt(el,fmt){S.format=fmt;document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');}
+function pickTone(el){S.tone=el.textContent;document.querySelectorAll('.tone-chip').forEach(e=>e.classList.remove('sel'));el.classList.add('sel');}
+
+// ── GENERATE ──────────────────────────────────
+const loadMsgs=['DANA is finding her angle…','Scripting the hook…','Choreographing the motion…','Setting the lighting…','Polishing the details…'];
+
+async function generatePrompt() {
+  if(!S.selectedTrendData){toast('Select a trend first');return;}
+  nav('output');
+  document.getElementById('output-empty').style.display='none';
+  document.getElementById('output-block').style.display='none';
+  document.getElementById('output-loader').style.display='block';
+  let mi=0; const msgEl=document.getElementById('loader-msg');
+  const ticker=setInterval(()=>{if(mi<loadMsgs.length-1){mi++;msgEl.textContent=loadMsgs[mi];}},2200);
+  const t=S.selectedTrendData; const pillar=S.selectedPillar;
+  const name=document.getElementById('s-name').value||'DANA AI';
+  const brand=document.getElementById('s-brand').value||'Primentoring.AI';
+  const avatar=document.getElementById('s-avatar').value||'DANA avatar in HeyGen';
+  const bio=document.getElementById('s-bio').value;
+  const pillars=document.getElementById('s-pillars').value;
+  const setting=document.getElementById('setting').value;
+  const outfit=document.getElementById('outfit').value;
+  const makeup=document.getElementById('makeup').value;
+  const notes=document.getElementById('notes').value;
+  const newsCtx=t.newsRef||'';
+
+  const system=`You are the creative director for ${name}, AI Life & Career Coach at ${brand}.
+DANA: ${bio}
+Pillars: ${pillars}
+
+NON-NEGOTIABLE RULES:
+MOTION: Every scene = continuous dynamic motion. No static poses. Active verbs always.
+ANGLES: Mix close-up, half-body, full-body.
+LIGHTING: Real, directional, cinematic. Specific source and quality.
+TEXT: ONLY on solid colour band at screen bottom OR separate plain frame. NEVER on DANA's face/skin/hair.
+ASSETS: Dynamic video only. No static images.
+HOOK: First 5 seconds. Curiosity/tension/recognition — not a command.
+SCRIPT: Minimal imperatives. Story-driven. DANA shares and observes.
+${newsCtx?'LIVE NEWS CONTEXT: '+newsCtx:''}
+
+Respond ONLY in valid JSON (no markdown):
+{"scene":"4-5 sentences. Avatar '${avatar}', setting, cinematic lighting, camera evolution, continuous actions with angle transitions.","styling":"2-3 sentences. Outfit, one imperfection detail, hair & makeup with lighting interaction.","script":"140-160 words ~60s. [PAUSE] [SLOW DOWN] (action cues). Hook before 5s. Story-driven. Soft close.","delivery":"4 bullets: energy arc, pacing callouts, gesture choreography, eye contact pattern.","text_overlay":"Text content, lower colour band placement, colour, timing. Confirm no text on face.","caption":"Line 1: scroll-stopping hook. Line 2: develops idea. Line 3: open question or soft invitation. 6-7 hashtags."}`;
+
+  try {
+    const data = await callAPI({
+      model:'claude-sonnet-4-20250514', max_tokens:1500, system,
+      messages:[{role:'user',content:`Trend: "${t.title}"\nHook: "${t.hook}"\nPlatform: ${t.platform}\nPillar: ${pillar}\nFormat: ${S.format}\nTone: ${S.tone}\nSetting: ${setting}\nOutfit: ${outfit}\nMakeup: ${makeup}\n${newsCtx?'News: '+newsCtx:''}\n${notes?'Notes: '+notes:''}`}]
+    });
+    const raw=data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    S.prompt={trend:t.title,pillar,platform:t.platform,date:new Date().toLocaleDateString('en-GB'),...p};
+    clearInterval(ticker);
+    document.getElementById('output-loader').style.display='none';
+    document.getElementById('output-block').style.display='block';
+    document.getElementById('o-scene').textContent=p.scene;
+    document.getElementById('o-styling').textContent=p.styling;
+    document.getElementById('o-script').textContent=p.script;
+    const dlRaw=typeof p.delivery==='string'?p.delivery:(Array.isArray(p.delivery)?p.delivery.join('\n'):JSON.stringify(p.delivery));
+    document.getElementById('o-delivery').innerHTML=dlRaw.split('\n').map(l=>l.trim()?'• '+l.replace(/^[-•\d.]\s*/,''):'').filter(Boolean).join('<br>');
+    document.getElementById('o-text').textContent=p.text_overlay||'—';
+    document.getElementById('o-caption').textContent=p.caption;
+  } catch(e) {
+    clearInterval(ticker);
+    document.getElementById('output-loader').style.display='none';
+    document.getElementById('output-empty').style.display='block';
+    document.getElementById('output-empty').innerHTML=`<span class="empty-glyph">✗</span><div class="empty-t" style="color:var(--rose)">${e.message}</div><div class="empty-s">Check your API key and try again</div>`;
+  }
+}
+
+// ── COPY / HISTORY ────────────────────────────
+function copyAll(){
+  if(!S.prompt)return;
+  const out=['=== DANA AI — HeyGen Prompt ===','⚠ RULES: Continuous motion · Cinematic lighting · Multi-angle · Text on lower band only — never on face\n',
+    '--- SCENE ---\n'+(S.prompt.scene||''),'\n--- WARDROBE ---\n'+(S.prompt.styling||''),
+    '\n--- SCRIPT ---\n'+(S.prompt.script||''),'\n--- DELIVERY ---\n'+(S.prompt.delivery||''),
+    '\n--- TEXT OVERLAY ---\n'+(S.prompt.text_overlay||'—'),'\n--- CAPTION ---\n'+(S.prompt.caption||'')
+  ].join('\n');
+  navigator.clipboard.writeText(out).then(()=>toast('Copied ✓'));
+}
+function saveHistory(){if(!S.prompt)return;S.history.unshift(S.prompt);if(S.history.length>30)S.history.pop();localStorage.setItem('dana_history',JSON.stringify(S.history));toast('Saved ✓');}
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!S.history.length){el.innerHTML='<div class="empty" style="padding:40px 0"><span class="empty-glyph" style="font-size:40px">◷</span><div class="empty-t">No saved prompts yet</div></div>';return;}
+  el.innerHTML=S.history.map((h,i)=>`<div class="history-item" onclick="loadHistory(${i})"><div class="h-title">${h.trend}</div><div class="h-meta"><span class="pill pill-${h.pillar||'career'}">${h.pillar||''}</span>${h.platform||''} · ${h.date||''}</div></div>`).join('');
+}
+function loadHistory(i){
+  const h=S.history[i];S.prompt=h;
+  document.getElementById('o-scene').textContent=h.scene||'';
+  document.getElementById('o-styling').textContent=h.styling||'';
+  document.getElementById('o-script').textContent=h.script||'';
+  const dlRaw=typeof h.delivery==='string'?h.delivery:(Array.isArray(h.delivery)?h.delivery.join('\n'):'');
+  document.getElementById('o-delivery').innerHTML=dlRaw.split('\n').map(l=>l.trim()?'• '+l.replace(/^[-•]\s*/,''):'').filter(Boolean).join('<br>');
+  document.getElementById('o-text').textContent=h.text_overlay||'—';
+  document.getElementById('o-caption').textContent=h.caption||'';
+  document.getElementById('output-empty').style.display='none';
+  document.getElementById('output-loader').style.display='none';
+  document.getElementById('output-block').style.display='block';
+  nav('output');
+}
+function checkKey(){const v=document.getElementById('apiKey').value.trim();const el=document.getElementById('keyStatus');if(!v){el.className='api-status';el.textContent='Required for AI generation';return;}el.className=v.startsWith('sk-ant-')?'api-status ok':'api-status err';el.textContent=v.startsWith('sk-ant-')?'✓ Key looks valid':'✗ Should start with sk-ant-';}
+function toggleKey(){const el=document.getElementById('apiKey');el.type=el.type==='password'?'text':'password';}
+function saveSettings(){toast('Profile saved ✓');}
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
+updateCounts(); renderTrends(); initTicker();
+</script>
+</body>
+</html>
