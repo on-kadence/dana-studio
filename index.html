@@ -550,7 +550,7 @@ async function fetchLiveNews() {
   btn.textContent='…';
   try {
     const data = await callAPI({
-      model:'claude-sonnet-4-20250514', max_tokens:900,
+      model:'claude-sonnet-4-6', max_tokens:900,
       tools:[{type:'web_search_20250305',name:'web_search'}],
       system:'Search for latest AI and career news today. Return ONLY JSON: {"ticker":"short headline string","trends":[{"title":string,"platform":"Instagram"|"TikTok","engagement":"Trending","hook":string,"isLive":true,"newsRef":string}]} — 5 items. No markdown.',
       messages:[{role:'user',content:'Search for top AI and workplace career news today June 9 2026. Generate 5 content ideas for DANA, an AI Life & Career Coach at Primentoring.AI, based on real news found.'}]
@@ -569,7 +569,7 @@ async function fetchAllTrends() {
   document.getElementById('trend-list').style.display='none';
   try {
     const data = await callAPI({
-      model:'claude-sonnet-4-20250514', max_tokens:1800,
+      model:'claude-sonnet-4-6', max_tokens:1800,
       system:'Generate trending social media content. Return ONLY JSON object with keys career,life,mindset,tech,promo. Each = array of 4-5 objects: {title,platform:"Instagram"|"TikTok",engagement,hook}. tech must reference current AI news June 2026. No markdown.',
       messages:[{role:'user',content:'Fresh trending templates for DANA, AI Life & Career Coach at Primentoring.AI. June 9 2026. All English.'}]
     });
