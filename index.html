@@ -500,126 +500,116 @@ async function refreshAll() {
   if (!key) { toast('Enter your API key first'); return; }
 
   var btn = document.getElementById('refresh-btn');
-  btn.disabled = true; btn.textContent = 'Loading...';
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
   document.getElementById('live-dot').className = 'live-dot loading';
   document.querySelectorAll('.source-tag').forEach(function(s){ s.classList.remove('active'); });
 
   var today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   var todayLong = new Date().toLocaleDateString('en-GB',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 
-  // ── STEP 1: Search real trend topics ──────────────────────────
-  setProgress(10, 'Searching TikTok and Google Trends...');
-  activateSrc('src-tiktok'); activateSrc('src-google'); activateSrc('src-linkedin');
-
-  var realTopics = [];
   try {
-    var trendSearch = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 300,
-      tools: [{type:'web_search_20250305',name:'web_search'}],
-      system: 'Search trends. Return ONLY JSON: {"topics":[string]} with 8 trending topic phrases for career/wellness. No markdown.',
-      messages: [{role:'user', content: 'Search for trending topics on TikTok and Google Trends for career, workplace, wellness for ' + today}]
-    });
-    var topicsObj = safeParseObject(extractText(trendSearch.content));
-    if (topicsObj && Array.isArray(topicsObj.topics)) realTopics = topicsObj.topics;
-  } catch(e) {
-    console.warn('Step 1 failed:', e.message);
-    // Use default topics and continue
-    realTopics = ['career pivots', 'burnout recovery', 'pay transparency', 'work life balance', 'AI jobs 2026', 'morning routines', 'boundaries at work', 'women in leadership'];
-  }
 
-  // ── STEP 2: Generate curated trends ───────────────────────────
-  setProgress(30, 'Generating curated trends...');
-  activateSrc('src-later');
-  await sleep(12000);
-
-  var topicsStr = realTopics.slice(0,8).join(', ');
-  try {
-    var curatedReq = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 1400,
-      system: 'Generate social media content for DANA, AI Life and Career Coach at Primentoring.AI (100+ mentors Google/Apple/Meta/NASA, 97% satisfaction, 130 countries). Real trending topics: ' + topicsStr + '. Return ONLY JSON: {"career":[...],"life":[...],"mindset":[...]}. Each array has 4 objects: {"title":string,"platform":"Instagram"|"TikTok","engagement":string,"hook":string,"sourceHint":string}. title = punchy human-sounding post title, not a command. hook = 1 arresting opening line. No markdown.',
-      messages: [{role:'user', content: todayLong + '. Generate 4 content ideas per pillar. DANA speaks to ambitious women 18-45. All English.'}]
-    });
-    var curatedParsed = safeParseObject(extractText(curatedReq.content));
-    if (curatedParsed) {
-      ['career','life','mindset'].forEach(function(k) {
-        if (curatedParsed[k] && Array.isArray(curatedParsed[k]) && curatedParsed[k].length) {
-          S.trends[k] = curatedParsed[k];
-        } else {
-          S.trends[k] = FALLBACK[k];
-        }
+    // STEP 1: Search real trend topics
+    setProgress(10, 'Searching TikTok and Google Trends...');
+    activateSrc('src-tiktok'); activateSrc('src-google'); activateSrc('src-linkedin');
+    var realTopics = [];
+    try {
+      var r1 = await callAPI({
+        model: 'claude-sonnet-4-6', max_tokens: 300,
+        tools: [{type:'web_search_20250305',name:'web_search'}],
+        system: 'Search trends. Return ONLY JSON: {"topics":[string]} with 8 trending topic phrases for career/wellness. No markdown.',
+        messages: [{role:'user', content: 'Trending topics on TikTok and Google Trends for career, workplace, wellness ' + today}]
       });
-    } else {
-      S.trends.career  = FALLBACK.career;
-      S.trends.life    = FALLBACK.life;
-      S.trends.mindset = FALLBACK.mindset;
+      var t1 = safeParseObject(extractText(r1.content));
+      if (t1 && Array.isArray(t1.topics)) realTopics = t1.topics;
+    } catch(e1) {
+      console.warn('Step 1:', e1.message);
+      realTopics = ['career pivots','burnout recovery','pay transparency','work life balance','AI jobs 2026','morning routines','boundaries at work','women in leadership'];
     }
-  } catch(e) {
-    console.warn('Step 2 failed:', e.message);
-    S.trends.career  = FALLBACK.career;
-    S.trends.life    = FALLBACK.life;
-    S.trends.mindset = FALLBACK.mindset;
+
+    // STEP 2: Generate curated trends
+    setProgress(30, 'Generating curated trends...');
+    activateSrc('src-later');
+    await sleep(12000);
+    try {
+      var topicsStr = realTopics.slice(0,8).join(', ');
+      var r2 = await callAPI({
+        model: 'claude-sonnet-4-6', max_tokens: 1400,
+        system: 'Generate social media content for DANA, AI Life and Career Coach at Primentoring.AI (100+ mentors Google/Apple/Meta/NASA, 97% satisfaction, 130 countries). Real trending topics: ' + topicsStr + '. Return ONLY JSON: {"career":[...],"life":[...],"mindset":[...]}. Each array has 4 objects: {"title":string,"platform":"Instagram"|"TikTok","engagement":string,"hook":string,"sourceHint":string}. title = punchy post title not a command. hook = 1 arresting opening line. No markdown.',
+        messages: [{role:'user', content: todayLong + '. Generate 4 content ideas per pillar for ambitious women 18-45. All English.'}]
+      });
+      var p2 = safeParseObject(extractText(r2.content));
+      if (p2) {
+        ['career','life','mindset'].forEach(function(k) {
+          S.trends[k] = (p2[k] && p2[k].length) ? p2[k] : FALLBACK[k];
+        });
+      } else {
+        S.trends.career = FALLBACK.career;
+        S.trends.life   = FALLBACK.life;
+        S.trends.mindset= FALLBACK.mindset;
+      }
+    } catch(e2) {
+      console.warn('Step 2:', e2.message);
+      S.trends.career = FALLBACK.career;
+      S.trends.life   = FALLBACK.life;
+      S.trends.mindset= FALLBACK.mindset;
+    }
+    updateCounts(); renderTrends();
+
+    // STEP 3: Fetch live news
+    setProgress(60, 'Fetching live news...');
+    activateSrc('src-news');
+    await sleep(12000);
+    try {
+      var r3 = await callAPI({
+        model: 'claude-sonnet-4-6', max_tokens: 600,
+        tools: [{type:'web_search_20250305',name:'web_search'}],
+        system: 'Search news. Return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"pillar":"news","newsRef":string,"source":string}]. title = social media headline DANA would use. hook = 1 arresting line. newsRef = key fact. No markdown.',
+        messages: [{role:'user', content: 'Top 4 AI, tech and career news from ' + today + '. Create DANA content ideas.'}]
+      });
+      var p3 = safeParseArray(extractText(r3.content));
+      S.trends.news = (Array.isArray(p3) && p3.length) ? p3 : FALLBACK.news;
+    } catch(e3) {
+      console.warn('Step 3:', e3.message);
+      S.trends.news = FALLBACK.news;
+    }
+    if (S.currentPillar === 'news') renderTrends();
+    updateCounts();
+
+    // STEP 4: Generate Primentoring from live news
+    setProgress(85, 'Building Primentoring content from live news...');
+    await sleep(12000);
+    try {
+      var newsForPromo = S.trends.news.slice(0,4);
+      var newsSnippet = newsForPromo.map(function(n,i){
+        return (i+1) + '. ' + n.title + ' (' + (n.newsRef||n.source||'') + ')';
+      }).join(' | ');
+      var r4 = await callAPI({
+        model: 'claude-sonnet-4-6', max_tokens: 500,
+        system: 'Generate Primentoring.AI content from news. Return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"promoAngle":string,"sourceHint":string}]. title = punchy post not a command. hook = 1 line using news as entry point connecting to mentorship. newsRef = news fact. promoAngle = 1 sentence on Primentoring.AI value. sourceHint = short label. No markdown.',
+        messages: [{role:'user', content: 'News: ' + newsSnippet + '. Create 4 DANA posts — each reacts to one news story and connects to why elite mentorship from Primentoring.AI matters (100+ mentors Google/Apple/Meta/Amazon/NASA, 24/7 AI mentor, 97% satisfaction, 130 countries).'}]
+      });
+      var p4 = safeParseArray(extractText(r4.content));
+      S.trends.promo = (Array.isArray(p4) && p4.length) ? p4 : FALLBACK.promo;
+    } catch(e4) {
+      console.warn('Step 4:', e4.message);
+      S.trends.promo = FALLBACK.promo;
+    }
+
+    setProgress(100, 'All trends loaded');
+    S.lastRefresh = new Date();
+    updateRefreshBar();
+    updateCounts();
+    renderTrends();
+    hideProgress();
+    toast('All tabs refreshed');
+
+  } finally {
+    // Always reset button no matter what
+    btn.disabled = false;
+    btn.textContent = 'Refresh all';
   }
-
-  // Update UI with what we have so far
-  updateCounts(); renderTrends();
-
-  // ── STEP 3: Fetch live news ────────────────────────────────────
-  setProgress(60, 'Fetching live news...');
-  activateSrc('src-news');
-  await sleep(12000);
-
-  try {
-    var newsReq = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 600,
-      tools: [{type:'web_search_20250305',name:'web_search'}],
-      system: 'Search news and return ONLY a JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"pillar":"news","newsRef":string,"source":string}]. title = social media headline DANA would use, not the original. hook = 1 arresting line. newsRef = key fact. No markdown.',
-      messages: [{role:'user', content: 'Find top 4 AI, tech and career news from ' + today + '. Create DANA content ideas from real stories found.'}]
-    });
-    var newsParsed = safeParseArray(extractText(newsReq.content));
-    S.trends.news = (Array.isArray(newsParsed) && newsParsed.length) ? newsParsed : FALLBACK.news;
-  } catch(e) {
-    console.warn('Step 3 failed:', e.message);
-    S.trends.news = FALLBACK.news;
-  }
-
-  // Update news tab
-  if (S.currentPillar === 'news') renderTrends();
-  updateCounts();
-
-  // ── STEP 4: Generate Primentoring from live news ───────────────
-  setProgress(85, 'Building Primentoring content from live news...');
-  await sleep(12000);
-
-  try {
-    var newsForPromo = S.trends.news.slice(0, 4);
-    var newsSnippet = newsForPromo.map(function(n,i){
-      return (i+1) + '. ' + n.title + ' (' + (n.newsRef||n.source||'') + ')';
-    }).join(' | ');
-
-    var promoReq = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 500,
-      system: 'Generate Primentoring.AI content from news. Return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"promoAngle":string,"sourceHint":string}]. title = punchy social post not a command. hook = 1 arresting line using the news as entry point then connecting to mentorship value. newsRef = the key news fact referenced. promoAngle = 1 sentence on Primentoring.AI connection. sourceHint = short label. No markdown.',
-      messages: [{role:'user', content: 'News to adapt: ' + newsSnippet + '. For each news story create 1 DANA post reacting to the news and connecting it to why elite mentorship from Primentoring.AI matters (100+ mentors from Google/Apple/Meta/Amazon/NASA, 24/7 AI mentor, 97% satisfaction, 130 countries).'}]
-    });
-
-    var promoParsed = safeParseArray(extractText(promoReq.content));
-    S.trends.promo = (Array.isArray(promoParsed) && promoParsed.length) ? promoParsed : FALLBACK.promo;
-    console.log('Promo from news:', S.trends.promo.length, 'items');
-  } catch(e) {
-    console.warn('Step 4 failed:', e.message);
-    S.trends.promo = FALLBACK.promo;
-  }
-
-  // Final update
-  setProgress(100, 'All trends loaded');
-  S.lastRefresh = new Date();
-  updateRefreshBar();
-  updateCounts();
-  renderTrends();
-  hideProgress();
-  toast('All tabs refreshed');
-
-  btn.disabled = false; btn.textContent = 'Refresh all';
 }
 
 // ── TRENDS ────────────────────────────────────────────────────────
