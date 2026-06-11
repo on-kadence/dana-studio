@@ -515,9 +515,9 @@ async function refreshAll() {
     activateSrc('src-tiktok'); activateSrc('src-google'); activateSrc('src-linkedin');
 
     var trendSearch = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 500,
+      model: 'claude-sonnet-4-6', max_tokens: 300,
       tools: [{type:'web_search_20250305',name:'web_search'}],
-      system: 'Search social media trends. Return ONLY JSON: {"topics":[string]} with 10-15 trending topic phrases for career/life/wellness content. No markdown.',
+      system: 'Search trends. Return ONLY JSON: {"topics":[string]} with 8 trending topic phrases for career/wellness. No markdown.',
       messages: [{role:'user', content: 'Search for trending topics on TikTok and Google Trends related to career, workplace, wellness, women in business for ' + today}]
     });
 
@@ -528,7 +528,7 @@ async function refreshAll() {
     // Step 2: wait then generate curated
     setProgress(30, 'Generating curated trends from real data...');
     activateSrc('src-later');
-    await sleep(8000);
+    await sleep(12000);
 
     var topicsStr = realTopics.slice(0,10).join(', ') || 'career growth, burnout recovery, work-life balance, AI jobs, pay transparency';
 
@@ -557,7 +557,7 @@ async function refreshAll() {
     // Step 3: wait then fetch news
     setProgress(65, 'Fetching live news...');
     activateSrc('src-news');
-    await sleep(8000);
+    await sleep(12000);
 
     var newsReq = await callAPI({
       model: 'claude-sonnet-4-6', max_tokens: 600,
@@ -571,13 +571,13 @@ async function refreshAll() {
 
     // Step 4: generate Primentoring content from live news
     setProgress(88, 'Building Primentoring content from live news...');
-    await sleep(5000);
+    await sleep(12000);
     var newsForPromo = S.trends.news.slice(0, 4);
     var newsSnippet = newsForPromo.map(function(n,i){ return (i+1) + '. ' + n.title + ' (' + (n.newsRef||n.source||'') + ')'; }).join(' | ');
 
     var promoReq = await callAPI({
-      model: 'claude-sonnet-4-6', max_tokens: 700,
-      system: 'Generate Primentoring.AI social media content based on real news. Return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"promoAngle":string,"sourceHint":string}]. title = punchy social post not a command. hook = 1 arresting line that uses the news as a natural entry point. newsRef = the key news fact. promoAngle = 1 sentence connecting to Primentoring.AI value. sourceHint = label like Primentoring x [news topic]. No markdown.',
+      model: 'claude-sonnet-4-6', max_tokens: 500,
+      system: 'Generate Primentoring.AI content from news. Return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"promoAngle":string,"sourceHint":string}]. title = punchy social post not a command. hook = 1 arresting line that uses the news as a natural entry point. newsRef = the key news fact. promoAngle = 1 sentence connecting to Primentoring.AI value. sourceHint = label like Primentoring x [news topic]. No markdown.',
       messages: [{role:'user', content: 'News to adapt into Primentoring.AI content: ' + newsSnippet + '. For each news story, create 1 DANA post that reacts to the news then naturally connects to why having a world-class mentor matters. Primentoring.AI has 100+ elite mentors from Google, Apple, Meta, Amazon, NASA, 24/7 AI mentor DANA, 97% satisfaction, 130 countries.'}]
     });
 
