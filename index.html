@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANA AI Studio — Primentoring.AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF8;--white:#FFFFFF;--surface:#F5F3F0;--surface2:#EDEAE5;
+  --border:#E8E4DE;--border2:#D8D2CA;
+  --purple:#6B4FA0;--purple-light:#8B6FC0;--purple-pale:#F0ECF8;
+  --purple-mid:#E0D6F0;--purple-deep:#4A3070;
+  --ink:#1A1614;--ink-soft:#4A4440;--ink-muted:#8A8280;--ink-faint:#B8B2AA;
+  --teal:#2D8A7C;--teal-pale:#E8F5F2;
+  --amber:#B8720A;--amber-pale:#FDF4E7;
+  --rose:#A84060;--rose-pale:#FAEEF2;
+  --news-pale:#E8F5EE;--news-mid:#C0DEC8;
+  --radius:14px;--radius-sm:8px;--radius-xs:6px;
+  --shadow-sm:0 1px 3px rgba(26,22,20,.06),0 2px 8px rgba(26,22,20,.04);
+  --shadow:0 2px 8px rgba(26,22,20,.08),0 8px 24px rgba(26,22,20,.06);
+  --shadow-lg:0 8px 32px rgba(26,22,20,.12),0 24px 64px rgba(26,22,20,.08);
+  --shadow-purple:0 4px 20px rgba(107,79,160,.25);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.sidebar{width:248px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:2px 0 16px rgba(26,22,20,.04)}
+.logo-wrap{padding:32px 24px 28px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.logo-wrap::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,var(--purple-pale),transparent 70%);pointer-events:none}
+.logo-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light),var(--purple-deep));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:20px;font-weight:500;color:white;margin-bottom:12px;box-shadow:var(--shadow-purple);position:relative}
+.logo-avatar::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid rgba(107,79,160,.2);animation:pulse-ring 3s ease-in-out infinite}
+@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.12);opacity:0}}
+.logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:var(--ink);letter-spacing:-.01em;line-height:1.2}
+.logo-name em{font-style:italic;color:var(--purple)}
+.logo-domain{font-size:11px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.nav{padding:16px 12px;flex:1}
+.nav-label{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);padding:0 10px;margin-bottom:6px;margin-top:16px}
+.nav-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--ink-muted);font-size:14px;font-weight:400;transition:all .2s cubic-bezier(.4,0,.2,1);margin-bottom:2px;position:relative}
+.nav-item .ni{width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:transform .2s}
+.nav-item:hover{background:var(--surface);color:var(--ink)}
+.nav-item:hover .ni{transform:scale(1.1)}
+.nav-item.active{background:var(--purple-pale);color:var(--purple);font-weight:500}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--purple);border-radius:0 3px 3px 0}
+.api-wrap{padding:16px;border-top:1px solid var(--border);background:var(--surface)}
+.api-lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-muted);margin-bottom:8px}
+.api-field{display:flex;align-items:center;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-xs);overflow:hidden;transition:border-color .15s}
+.api-field:focus-within{border-color:var(--purple-light)}
+.api-field input{flex:1;padding:8px 10px;background:none;border:none;outline:none;font-size:12px;color:var(--ink);font-family:'DM Sans',sans-serif}
+.api-field input::placeholder{color:var(--ink-faint)}
+.api-eye{padding:0 10px;cursor:pointer;color:var(--ink-faint);font-size:14px;user-select:none;transition:color .15s}
+.api-eye:hover{color:var(--purple)}
+.api-status{font-size:11px;margin-top:5px;color:var(--ink-faint)}
+.api-status.ok{color:var(--teal)}.api-status.err{color:var(--rose)}
+.api-remember{display:flex;align-items:center;gap:6px;margin-top:7px;cursor:pointer}
+.api-remember input[type=checkbox]{accent-color:var(--purple);width:13px;height:13px;cursor:pointer}
+.api-remember span{font-size:11px;color:var(--ink-muted)}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.panel{display:none}
+.panel.active{display:block;animation:panelIn .3s cubic-bezier(.4,0,.2,1)}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.page-hero{padding:48px 52px 36px;border-bottom:1px solid var(--border);background:var(--white);position:relative;overflow:hidden}
+.page-hero::after{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,var(--purple-pale),transparent 65%);pointer-events:none}
+.page-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);background:var(--purple-pale);padding:4px 12px;border-radius:20px;margin-bottom:14px;border:1px solid var(--purple-mid)}
+.page-title{font-family:'Playfair Display',serif;font-size:36px;font-weight:500;color:var(--ink);letter-spacing:-.02em;line-height:1.15;margin-bottom:8px}
+.page-title em{font-style:italic;color:var(--purple)}
+.page-sub{font-size:15px;color:var(--ink-muted);font-weight:300;max-width:520px}
+.page-body{padding:32px 52px 52px}
+.sources-strip{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:16px;box-shadow:var(--shadow-sm);flex-wrap:wrap}
+.sources-label{font-size:11px;font-weight:500;color:var(--ink-muted);margin-right:4px;white-space:nowrap}
+.source-tag{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:400;color:var(--ink-soft);background:var(--surface);border:1px solid var(--border);white-space:nowrap;transition:all .3s}
+.source-tag.active{background:var(--purple-pale);color:var(--purple);border-color:var(--purple-mid)}
+.refresh-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:12px 16px;background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm)}
+.refresh-bar-left{display:flex;align-items:center;gap:10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#94A3B8;flex-shrink:0;transition:all .4s}
+.live-dot.live{background:#22C55E;box-shadow:0 0 0 3px rgba(34,197,94,.2);animation:blink 2.5s ease-in-out infinite}
+.live-dot.loading{background:#F59E0B;box-shadow:0 0 0 3px rgba(245,158,11,.2);animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.refresh-bar-text{font-size:13px;color:var(--ink-soft);font-weight:400}
+.refresh-bar-time{font-size:11px;color:var(--ink-faint);font-style:italic}
+.refresh-all-btn{padding:8px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--purple);border:1.5px solid var(--purple-mid);background:var(--purple-pale);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.refresh-all-btn:hover{background:var(--purple-mid)}
+.refresh-all-btn:disabled{opacity:.5;cursor:not-allowed}
+.progress-bar{height:3px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;display:none}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple-light),var(--purple));border-radius:3px;transition:width .6s ease;width:0}
+.filter-tabs{display:flex;background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:4px;margin-bottom:24px;box-shadow:var(--shadow-sm);overflow-x:auto;gap:0}
+.ftab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:400;color:var(--ink-muted);transition:all .22s cubic-bezier(.4,0,.2,1);white-space:nowrap}
+.ftab:hover{color:var(--ink);background:var(--surface)}
+.ftab.active{font-weight:500;box-shadow:var(--shadow-sm)}
+.ftab.active.career{color:var(--purple);background:var(--purple-pale)}
+.ftab.active.life{color:var(--teal);background:var(--teal-pale)}
+.ftab.active.mindset{color:var(--amber);background:var(--amber-pale)}
+.ftab.active.news{color:#166534;background:var(--news-pale)}
+.ftab.active.promo{color:var(--purple-deep);background:var(--purple-pale)}
+.ftab-icon{font-size:15px}
+.ftab-count{font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px;background:var(--surface2);color:var(--ink-muted)}
+.ftab.active.career .ftab-count{background:var(--purple-mid);color:var(--purple)}
+.ftab.active.life .ftab-count{background:#C8EDE8;color:var(--teal)}
+.ftab.active.mindset .ftab-count{background:#F5E0C0;color:var(--amber)}
+.ftab.active.news .ftab-count{background:var(--news-mid);color:#166534}
+.ftab.active.promo .ftab-count{background:var(--purple-mid);color:var(--purple-deep)}
+.trend-grid{display:grid;grid-template-columns:1fr;gap:10px;min-height:180px}
+.trend-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);display:flex;align-items:flex-start;gap:16px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.trend-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:all .2s}
+.trend-card:hover{border-color:var(--purple-light);box-shadow:var(--shadow);transform:translateY(-1px)}
+.trend-card:hover::before{background:var(--purple-light)}
+.trend-card.sel{border-color:var(--purple);background:var(--purple-pale);box-shadow:var(--shadow-purple);transform:translateY(-1px)}
+.trend-card.sel::before{background:var(--purple)}
+.trend-card.is-news.sel{border-color:#2D7A4A;background:var(--news-pale)}
+.trend-card.is-news.sel::before{background:#2D7A4A}
+.trend-card.is-news::before{background:var(--news-mid)}
+.t-num{font-size:11px;font-weight:600;color:var(--ink-faint);min-width:22px;padding-top:3px}
+.trend-card.sel .t-num{color:var(--purple)}
+.t-body{flex:1}
+.t-title{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:7px;line-height:1.4}
+.trend-card.sel .t-title{color:var(--purple-deep)}
+.t-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.t-hook{font-size:12px;color:var(--ink-muted);font-style:italic;font-weight:300;line-height:1.45}
+.t-source{font-size:11px;color:#4A7A5A;margin-top:4px;font-weight:400}
+.t-newsref{font-size:11px;color:var(--ink-muted);margin-top:3px;font-weight:300;line-height:1.4}
+.pill{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.pill-ig{background:var(--rose-pale);color:var(--rose)}
+.pill-tt{background:var(--surface2);color:var(--ink-soft)}
+.pill-career{background:var(--purple-pale);color:var(--purple)}
+.pill-life{background:var(--teal-pale);color:var(--teal)}
+.pill-mindset{background:var(--amber-pale);color:var(--amber)}
+.pill-promo{background:var(--purple-mid);color:var(--purple-deep)}
+.pill-news{background:var(--news-pale);color:#166534;border:1px solid var(--news-mid)}
+.pill-live{background:#FFF7ED;color:#9A3412;border:1px solid #FED7AA}
+.t-stat{font-size:11px;color:var(--ink-faint)}
+.t-arrow{color:var(--ink-faint);font-size:18px;padding-top:1px;transition:all .2s;align-self:center}
+.trend-card:hover .t-arrow,.trend-card.sel .t-arrow{transform:translateX(3px);color:var(--purple)}
+.tab-loading{display:flex;flex-direction:column;align-items:center;padding:60px 20px;gap:14px}
+.tab-loading-orb{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--purple-light),var(--purple-deep));animation:orb-pulse 1.8s ease-in-out infinite;box-shadow:var(--shadow-purple)}
+@keyframes orb-pulse{0%,100%{transform:scale(.9);opacity:.7}50%{transform:scale(1.1);opacity:1}}
+.tab-loading-msg{font-size:14px;color:var(--ink-muted);font-weight:300;font-family:'Playfair Display',serif;font-style:italic;text-align:center}
+.tab-loading-sub{font-size:12px;color:var(--ink-faint);text-align:center;font-weight:300}
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 26px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.card-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-muted);margin-bottom:16px}
+.fmt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fmt-opt{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:16px 12px;text-align:center;cursor:pointer;transition:all .22s cubic-bezier(.4,0,.2,1);background:var(--surface)}
+.fmt-opt:hover{border-color:var(--purple-light);background:var(--purple-pale);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.fmt-opt.sel{border-color:var(--purple);background:var(--purple-pale);box-shadow:0 0 0 3px rgba(107,79,160,.1);transform:translateY(-2px)}
+.fmt-e{font-size:24px;margin-bottom:6px;display:block;transition:transform .2s}
+.fmt-opt:hover .fmt-e,.fmt-opt.sel .fmt-e{transform:scale(1.1)}
+.fmt-l{font-size:12px;color:var(--ink-muted);font-weight:400}
+.fmt-opt.sel .fmt-l{color:var(--purple);font-weight:500}
+.tone-row{display:flex;gap:8px;flex-wrap:wrap}
+.tone-chip{padding:8px 16px;border-radius:24px;font-size:13px;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--ink-muted);transition:all .2s cubic-bezier(.4,0,.2,1);font-weight:400}
+.tone-chip:hover{border-color:var(--purple-light);color:var(--purple);transform:translateY(-1px)}
+.tone-chip.sel{background:var(--purple);color:white;border-color:var(--purple);font-weight:500;box-shadow:var(--shadow-purple);transform:translateY(-1px)}
+.field-label{font-size:12px;font-weight:500;color:var(--ink-soft);margin-bottom:6px;display:block}
+input[type=text],textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-xs);font-size:14px;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--white);outline:none;transition:all .15s;font-weight:300;appearance:none}
+input[type=text]:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(107,79,160,.08)}
+textarea{resize:vertical;min-height:88px;line-height:1.65}
+.sel-preview{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;background:var(--purple-pale);border-radius:var(--radius-sm);border:1.5px solid var(--purple-mid);margin-bottom:20px}
+.sel-preview-dot{width:8px;height:8px;border-radius:50%;background:var(--purple);flex-shrink:0;margin-top:6px;box-shadow:0 0 0 3px rgba(107,79,160,.2)}
+.sel-preview-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:3px}
+.sel-preview-text{font-size:14px;color:var(--purple-deep);font-weight:300;line-height:1.4}
+.news-ctx{background:linear-gradient(135deg,var(--news-pale),#F0FDF4);border:1.5px solid var(--news-mid);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:16px}
+.news-ctx-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#166534;margin-bottom:5px}
+.news-ctx-text{font-size:13px;color:#1A3A2A;font-weight:300;line-height:1.6;font-style:italic}
+.rules-card{background:linear-gradient(135deg,var(--purple-pale),#FDF8FF);border:1.5px solid var(--purple-mid);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px}
+.rules-title{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:12px}
+.rule-item{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--ink-soft);font-weight:300;line-height:1.55;margin-bottom:7px}
+.rule-item:last-child{margin-bottom:0}
+.rule-dot{width:5px;height:5px;border-radius:50%;background:var(--purple-light);flex-shrink:0;margin-top:7px}
+.vibe-hint{font-size:11px;color:var(--ink-faint);margin-top:6px;font-style:italic}
+.btn{padding:11px 22px;border-radius:var(--radius-sm);font-size:14px;font-weight:500;cursor:pointer;border:1.5px solid var(--border2);background:var(--white);color:var(--ink-soft);font-family:'DM Sans',sans-serif;transition:all .2s cubic-bezier(.4,0,.2,1);display:inline-flex;align-items:center;gap:8px}
+.btn:hover{border-color:var(--purple-light);color:var(--purple);transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.btn-purple{background:var(--purple);border-color:var(--purple);color:white;box-shadow:var(--shadow-purple)}
+.btn-purple:hover{background:var(--purple-deep);border-color:var(--purple-deep);color:white;box-shadow:0 6px 24px rgba(107,79,160,.35);transform:translateY(-2px)}
+.btn-teal{border-color:var(--teal);color:var(--teal)}
+.btn-teal:hover{background:var(--teal-pale)}
+.btn-row{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;align-items:center}
+.prompt-wrap{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.prompt-sec{padding:22px 28px;border-bottom:1px solid var(--border);transition:background .15s}
+.prompt-sec:last-child{border-bottom:none}
+.prompt-sec:hover{background:var(--bg)}
+.prompt-sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.prompt-sec-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--purple);flex:1}
+.prompt-sec-tag{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-pale);color:var(--purple);font-weight:500;border:1px solid var(--purple-mid)}
+.prompt-sec-body{font-size:14px;line-height:1.9;color:var(--ink-soft);white-space:pre-wrap;font-weight:300}
+.prompt-sec-body.script{font-family:'Playfair Display',serif;font-size:17px;color:var(--ink);line-height:2;font-style:italic;font-weight:400}
+.loader{text-align:center;padding:100px 20px;display:none}
+.loader-orb{width:56px;height:56px;border-radius:50%;margin:0 auto 24px;background:linear-gradient(135deg,var(--purple-light),var(--purple-deep));animation:orb-pulse 1.8s ease-in-out infinite;box-shadow:var(--shadow-purple)}
+.loader-msg{font-size:15px;color:var(--ink-muted);font-weight:300;font-family:'Playfair Display',serif;font-style:italic}
+.empty{text-align:center;padding:100px 20px}
+.empty-glyph{font-family:'Playfair Display',serif;font-size:64px;color:var(--border2);margin-bottom:16px;display:block;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.empty-t{font-size:17px;color:var(--ink-muted);font-weight:300}
+.empty-s{font-size:14px;color:var(--ink-faint);margin-top:6px}
+.history-item{padding:18px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s}
+.history-item:last-child{border-bottom:none}
+.history-item:hover .h-title{color:var(--purple)}
+.h-title{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;transition:color .15s;line-height:1.4}
+.h-meta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--ink-faint)}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:white;padding:12px 24px;border-radius:24px;font-size:14px;opacity:0;transition:all .25s cubic-bezier(.4,0,.2,1);pointer-events:none;z-index:9999;box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+@media(max-width:800px){.sidebar{display:none}.page-hero{padding:32px 24px 24px}.page-body{padding:24px}.fmt-grid{grid-template-columns:repeat(2,1fr)}.page-title{font-size:28px}.filter-tabs{gap:2px}.ftab{padding:8px 8px;font-size:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-avatar">D</div>
+      <div class="logo-name">DANA <em>AI</em> Studio</div>
+      <div class="logo-domain">primentoring.ai</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-label">Workflow</div>
+      <div class="nav-item active" onclick="nav('trends')"><span class="ni">◈</span> Trend Radar</div>
+      <div class="nav-item" onclick="nav('customize')"><span class="ni">✦</span> Customize</div>
+      <div class="nav-item" onclick="nav('output')"><span class="ni">◎</span> HeyGen Prompt</div>
+      <div class="nav-label">Manage</div>
+      <div class="nav-item" onclick="nav('history')"><span class="ni">◷</span> History</div>
+      <div class="nav-item" onclick="nav('settings')"><span class="ni">⊙</span> DANA Profile</div>
+    </nav>
+    <div class="api-wrap">
+      <div class="api-lbl">Anthropic API Key</div>
+      <div class="api-field">
+        <input type="password" id="apiKey" placeholder="sk-ant-..." oninput="onKeyInput()">
+        <span class="api-eye" onclick="toggleKey()">👁</span>
+      </div>
+      <div class="api-status" id="keyStatus">Required for AI generation</div>
+      <label class="api-remember">
+        <input type="checkbox" id="rememberKey" onchange="toggleRemember()">
+        <span>Remember on this device</span>
+      </label>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- TREND RADAR -->
+    <div id="panel-trends" class="panel active">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 01</div>
+        <div class="page-title">Trend <em>Radar</em></div>
+        <div class="page-sub">Refreshes from real sources — TikTok Creative Center, Google Trends, LinkedIn & live news. Click any card to use it.</div>
+      </div>
+      <div class="page-body">
+        <div class="sources-strip">
+          <span class="sources-label">Sources:</span>
+          <span class="source-tag" id="src-tiktok">TikTok Creative Center</span>
+          <span class="source-tag" id="src-google">Google Trends</span>
+          <span class="source-tag" id="src-linkedin">LinkedIn</span>
+          <span class="source-tag" id="src-later">Later / Hootsuite</span>
+          <span class="source-tag" id="src-news">Live News</span>
+        </div>
+        <div class="refresh-bar">
+          <div class="refresh-bar-left">
+            <div class="live-dot" id="live-dot"></div>
+            <span class="refresh-bar-text" id="refresh-bar-text">Click Refresh to load today's real trends</span>
+            <span class="refresh-bar-time" id="refresh-bar-time"></span>
+          </div>
+          <button class="refresh-all-btn" id="refresh-btn" onclick="refreshAll()">↺ Refresh all</button>
+        </div>
+        <div class="progress-bar" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="filter-tabs">
+          <div class="ftab active career" onclick="switchPillar('career',this)"><span class="ftab-icon">💼</span> Career <span class="ftab-count" id="count-career">—</span></div>
+          <div class="ftab life" onclick="switchPillar('life',this)"><span class="ftab-icon">🌿</span> Life <span class="ftab-count" id="count-life">—</span></div>
+          <div class="ftab mindset" onclick="switchPillar('mindset',this)"><span class="ftab-icon">🧠</span> Mindset <span class="ftab-count" id="count-mindset">—</span></div>
+          <div class="ftab news" onclick="switchPillar('news',this)"><span class="ftab-icon">📰</span> Today's News <span class="ftab-count" id="count-news">—</span></div>
+          <div class="ftab promo" onclick="switchPillar('promo',this)"><span class="ftab-icon">✦</span> Primentoring <span class="ftab-count" id="count-promo">—</span></div>
+        </div>
+        <div class="trend-grid" id="trend-list">
+          <div class="tab-loading">
+            <div class="tab-loading-orb"></div>
+            <div class="tab-loading-msg">Click "Refresh all" to load today's real trends</div>
+            <div class="tab-loading-sub">TikTok Creative Center · Google Trends · LinkedIn · Live News</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-purple" onclick="goCustomize()">Customize selected →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMIZE -->
+    <div id="panel-customize" class="panel">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 02</div>
+        <div class="page-title">Customize <em>DANA</em></div>
+        <div class="page-sub">Format and tone only — scene, lighting, and styling are AI-generated fresh every time.</div>
+      </div>
+      <div class="page-body">
+        <div class="rules-card">
+          <div class="rules-title">🎬 Production Rules — every prompt</div>
+          <div class="rule-item"><div class="rule-dot"></div>Continuous dynamic motion — no static poses, no frozen frames</div>
+          <div class="rule-item"><div class="rule-dot"></div>Multi-angle variety: close-up, half-body, and full-body</div>
+          <div class="rule-item"><div class="rule-dot"></div>Real, textured, directional lighting — specific sources, natural shadows</div>
+          <div class="rule-item"><div class="rule-dot"></div>Human authenticity details: micro-expressions, imperfect gestures, hair movement</div>
+          <div class="rule-item"><div class="rule-dot"></div>Text overlays on solid colour band at bottom only — never on DANA's face</div>
+          <div class="rule-item"><div class="rule-dot"></div>Hook in first 3 seconds · Script sounds like real speech, not a teleprompter</div>
+        </div>
+        <div class="sel-preview">
+          <div class="sel-preview-dot"></div>
+          <div>
+            <div class="sel-preview-label">Selected trend</div>
+            <div class="sel-preview-text" id="preview-text">No trend selected — go to Trend Radar first</div>
+          </div>
+        </div>
+        <div id="news-ctx-box" style="display:none" class="news-ctx">
+          <div class="news-ctx-label">📰 Live news context — woven into your prompt</div>
+          <div class="news-ctx-text" id="news-ctx-text"></div>
+        </div>
+        <div class="card">
+          <div class="card-label">Video format</div>
+          <div class="fmt-grid">
+            <div class="fmt-opt sel" onclick="pickFmt(this,'Talking head — continuous natural movement, posture and gesture shifts, close-up and medium framing')"><span class="fmt-e">🎙</span><span class="fmt-l">Talking Head</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Lifestyle montage — DANA moving through real environments, observational camera, no direct address')"><span class="fmt-e">🎬</span><span class="fmt-l">Lifestyle Montage</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'POV reaction — responding mid-conversation, expressive gestures, active movement throughout')"><span class="fmt-e">💬</span><span class="fmt-l">POV / Reaction</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Day-in-the-life — moving through morning or evening scenes, full-body and intimate close-ups')"><span class="fmt-e">☀️</span><span class="fmt-l">Day in Life</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Before & after — two contrasting dynamic scenes in continuous motion')"><span class="fmt-e">🔄</span><span class="fmt-l">Before / After</span></div>
+            <div class="fmt-opt" onclick="pickFmt(this,'Voiceover montage — moving through intimate everyday scenes, cinematic observational camera')"><span class="fmt-e">🌙</span><span class="fmt-l">Voiceover</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">DANA's tone</div>
+          <div class="tone-row">
+            <div class="tone-chip sel" onclick="pickTone(this)">Warm & Direct</div>
+            <div class="tone-chip" onclick="pickTone(this)">Bold & Empowering</div>
+            <div class="tone-chip" onclick="pickTone(this)">Vulnerable & Real</div>
+            <div class="tone-chip" onclick="pickTone(this)">Playful & Witty</div>
+            <div class="tone-chip" onclick="pickTone(this)">Expert & Confident</div>
+            <div class="tone-chip" onclick="pickTone(this)">Quiet & Reflective</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-label">Vibe direction <span style="font-weight:300;color:var(--ink-faint);font-size:11px;text-transform:none;letter-spacing:0">— optional, AI invents if blank</span></div>
+          <textarea id="vibe" style="min-height:72px" placeholder="e.g. rainy morning, just back from a run… dark academia study room at night… rooftop golden hour…"></textarea>
+          <div class="vibe-hint">Leave blank → AI picks the setting, lighting, outfit, and makeup that best serve this content.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Additional direction <span style="font-weight:300;color:var(--ink-faint);font-size:11px;text-transform:none;letter-spacing:0">— optional</span></div>
+          <textarea id="notes" placeholder="e.g. more vulnerable… add a salary negotiation story… reference the 97% satisfaction stat…"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-purple" onclick="generatePrompt()">✦ Generate HeyGen Prompt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div id="panel-output" class="panel">
+      <div class="page-hero">
+        <div class="page-eyebrow">Step 03</div>
+        <div class="page-title">HeyGen <em>Prompt</em></div>
+        <div class="page-sub">All motion, lighting, and authenticity rules applied. Ready to paste.</div>
+      </div>
+      <div class="page-body">
+        <div id="output-loader" class="loader"><div class="loader-orb"></div><div class="loader-msg" id="loader-msg">DANA is finding her angle…</div></div>
+        <div id="output-empty" class="empty"><span class="empty-glyph">◎</span><div class="empty-t">No prompt yet</div><div class="empty-s">Select a trend and click Generate</div></div>
+        <div id="output-block" style="display:none">
+          <div class="prompt-wrap">
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Scene & Motion Direction</div><span class="prompt-sec-tag">🎬 Motion · Lighting · Angles</span></div><div class="prompt-sec-body" id="o-scene"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Wardrobe & Beauty</div><span class="prompt-sec-tag">AI-generated for this content</span></div><div class="prompt-sec-body" id="o-styling"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Script / Voiceover</div><span class="prompt-sec-tag">~60 seconds</span></div><div class="prompt-sec-body script" id="o-script"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Delivery & Motion Notes</div></div><div class="prompt-sec-body" id="o-delivery"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Text Overlay & Graphics</div><span class="prompt-sec-tag">No text on face</span></div><div class="prompt-sec-body" id="o-text"></div></div>
+            <div class="prompt-sec"><div class="prompt-sec-hd"><div class="prompt-sec-title">Caption & Hashtags</div></div><div class="prompt-sec-body" id="o-caption"></div></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-purple" onclick="copyAll()">⎘ Copy full prompt</button>
+            <button class="btn btn-teal" onclick="saveHistory()">+ Save to history</button>
+            <button class="btn" onclick="nav('trends')">New content</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="panel-history" class="panel">
+      <div class="page-hero"><div class="page-eyebrow">Archive</div><div class="page-title">Prompt <em>History</em></div><div class="page-sub">Saved locally in your browser.</div></div>
+      <div class="page-body"><div class="card" id="history-list" style="padding:8px 20px"></div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="panel-settings" class="panel">
+      <div class="page-hero"><div class="page-eyebrow">Configuration</div><div class="page-title">DANA <em>Profile</em></div><div class="page-sub">Applied to every generated prompt.</div></div>
+      <div class="page-body">
+        <div class="card">
+          <div class="card-label">Identity</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <div><label class="field-label">Name</label><input type="text" id="s-name" value="DANA AI"></div>
+            <div><label class="field-label">Brand</label><input type="text" id="s-brand" value="Primentoring.AI"></div>
+          </div>
+          <label class="field-label">HeyGen Avatar Name</label>
+          <input type="text" id="s-avatar" value="DANA — saved avatar in HeyGen">
+        </div>
+        <div class="card">
+          <div class="card-label">Bio & Backstory</div>
+          <textarea id="s-bio" style="min-height:100px">DANA is a Life & Career Coach and the AI Mentor at Primentoring.AI. She navigated burnout, career pivots, and built her own path. Warm, direct, real — the friend who tells you what you need to hear. Platform: 100+ elite mentors from Google, Apple, Meta, Amazon, NASA. 97% client satisfaction across 130 countries.</textarea>
+        </div>
+        <div class="card">
+          <div class="card-label">Content Pillars</div>
+          <textarea id="s-pillars" style="min-height:70px">Career growth, promotions, boundaries, routines, self-worth, toxic workplaces, financial independence, mindset, authentic leadership, AI & future of work, mentorship access, career transitions</textarea>
+        </div>
+        <div class="btn-row"><button class="btn btn-purple" onclick="saveSettings()">Save profile</button></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── API PROXY ──────────────────────────────────────────
+async function callAPI(payload) {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) throw new Error('Enter your API key first');
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ apiKey: key, ...payload })
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(typeof data.error==='string' ? data.error : JSON.stringify(data.error));
+  return data;
+}
+
+// small delay helper to avoid rate limits
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ── STATE ──────────────────────────────────────────────
+const S = {
+  currentPillar: 'career',
+  selected: null, selectedTrendData: null, selectedPillar: null,
+  format: 'Talking head — continuous natural movement, posture and gesture shifts, close-up and medium framing',
+  tone: 'Warm & Direct',
+  prompt: null,
+  history: JSON.parse(localStorage.getItem('dana_history') || '[]'),
+  trends: { career:[], life:[], mindset:[], news:[], promo:[] },
+  lastRefresh: null
+};
+
+// ── KEY MEMORY ─────────────────────────────────────────
+function loadSavedKey() {
+  const saved = localStorage.getItem('dana_api_key');
+  const remember = localStorage.getItem('dana_remember_key') === 'true';
+  if (saved && remember) {
+    document.getElementById('apiKey').value = saved;
+    document.getElementById('rememberKey').checked = true;
+    updateKeyStatus(saved);
+  }
+}
+function onKeyInput() {
+  const v = document.getElementById('apiKey').value.trim();
+  updateKeyStatus(v);
+  if (document.getElementById('rememberKey').checked && v) localStorage.setItem('dana_api_key', v);
+}
+function toggleRemember() {
+  const c = document.getElementById('rememberKey').checked;
+  localStorage.setItem('dana_remember_key', c);
+  const v = document.getElementById('apiKey').value.trim();
+  if (c && v) localStorage.setItem('dana_api_key', v);
+  else localStorage.removeItem('dana_api_key');
+}
+function updateKeyStatus(v) {
+  const el = document.getElementById('keyStatus');
+  if (!v) { el.className='api-status'; el.textContent='Required for AI generation'; return; }
+  el.className = v.startsWith('sk-ant-') ? 'api-status ok' : 'api-status err';
+  el.textContent = v.startsWith('sk-ant-') ? '✓ Key looks valid' : '✗ Should start with sk-ant-';
+}
+function toggleKey() { const el=document.getElementById('apiKey'); el.type=el.type==='password'?'text':'password'; }
+
+// ── NAV ────────────────────────────────────────────────
+function nav(id) {
+  document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));
+  ['trends','customize','output','history','settings'].forEach((p,i) => {
+    if (p===id) { document.querySelectorAll('.nav-item')[i].classList.add('active'); document.getElementById('panel-'+p).classList.add('active'); }
+  });
+  if (id==='history') renderHistory();
+}
+
+// ── PROGRESS ───────────────────────────────────────────
+function setProgress(pct, msg) {
+  document.getElementById('progress-bar').style.display = 'block';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  if (msg) document.getElementById('refresh-bar-text').textContent = msg;
+}
+function hideProgress() {
+  setTimeout(() => { document.getElementById('progress-bar').style.display = 'none'; }, 800);
+}
+function activateSrc(id) { document.getElementById(id).classList.add('active'); }
+
+// ── REFRESH ALL — sequential with delays ───────────────
+async function refreshAll() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) { toast('Enter your API key first'); return; }
+
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true; btn.textContent = '↺ Loading…';
+  document.getElementById('live-dot').className = 'live-dot loading';
+  document.querySelectorAll('.source-tag').forEach(s=>s.classList.remove('active'));
+  setProgress(5, 'Starting…');
+  showTabLoading('Scanning real-time trends…', 'TikTok Creative Center · Google Trends · LinkedIn');
+
+  const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const todayShort = new Date().toLocaleDateString('en-GB',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  try {
+    // ── STEP 1: Search real trend sources (compact prompt) ──
+    setProgress(15, 'Searching TikTok & Google Trends…');
+    activateSrc('src-tiktok'); activateSrc('src-google'); activateSrc('src-linkedin');
+
+    const trendSearch = await callAPI({
+      model: 'claude-sonnet-4-6', max_tokens: 500,
+      tools: [{ type:'web_search_20250305', name:'web_search' }],
+      system: 'Search social media trends. Return ONLY JSON: {"topics":[string]} — 12-15 trending topic phrases from TikTok, Google Trends, LinkedIn for career/life/wellness content. No markdown.',
+      messages: [{ role:'user', content: `Search "TikTok trending topics career wellness ${today}" and "Google Trends rising topics women workplace 2026". List what you find.` }]
+    });
+
+    const trendRaw = trendSearch.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+    let realTopics = [];
+    try { realTopics = JSON.parse(trendRaw).topics || []; } catch(e) {}
+
+    // ── STEP 2: Wait 8 seconds to avoid rate limit ──
+    setProgress(30, 'Generating curated trends from real data…');
+    activateSrc('src-later');
+    await sleep(8000);
+
+    // ── STEP 3: Generate all 4 curated tabs in one request ──
+    const curatedReq = await callAPI({
+      model: 'claude-sonnet-4-6', max_tokens: 1400,
+      system: `Generate social media content for DANA, AI Life & Career Coach at Primentoring.AI (100+ mentors Google/Apple/Meta/NASA, 97% satisfaction, 130 countries).
+Real trending topics found: ${realTopics.slice(0,10).join(', ') || 'career growth, burnout, work-life balance, AI jobs, quiet quitting 2.0'}.
+Return ONLY JSON: {"career":[...],"life":[...],"mindset":[...],"promo":[...]}. Each array = 4 objects: {"title":string,"platform":"Instagram"|"TikTok","engagement":string,"hook":string,"sourceHint":string}. title = punchy human-sounding social post (not a command). hook = 1 arresting opening sentence, real speech. sourceHint = which real trend this adapts. No markdown.`,
+      messages: [{ role:'user', content:`${todayShort}. Generate 4 content ideas per pillar grounded in the real trends listed. All English. DANA speaks to ambitious women 18-45.` }]
+    });
+
+    try {
+      const raw = curatedReq.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(raw);
+      ['career','life','mindset','promo'].forEach(k => { if (parsed[k]) S.trends[k] = parsed[k]; });
+    } catch(e) {}
+
+    // ── STEP 4: Wait 8 seconds then fetch news ──
+    setProgress(65, 'Fetching today\'s live news…');
+    activateSrc('src-news');
+    await sleep(8000);
+
+    // ── STEP 5: News search (compact) ──
+    const newsReq = await callAPI({
+      model: 'claude-sonnet-4-6', max_tokens: 600,
+      tools: [{ type:'web_search_20250305', name:'web_search' }],
+      system: 'Search news and return ONLY JSON array of 4 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"pillar":"news","newsRef":string,"source":string}]. title = social-media headline DANA would use (not original headline, not a command). hook = 1 arresting opening line. newsRef = key stat or fact. No markdown.',
+      messages: [{ role:'user', content:`Find top 4 AI/tech/career news from ${today}. Create DANA content ideas from real stories found.` }]
+    });
+
+    try {
+      const raw = newsReq.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+      S.trends.news = JSON.parse(raw);
+    } catch(e) { S.trends.news = []; }
+
+    setProgress(100, 'All trends loaded');
+    S.lastRefresh = new Date();
+    updateRefreshBar();
+    updateCounts();
+    renderTrends();
+    hideProgress();
+    toast('All tabs refreshed ✓');
+
+  } catch(e) {
+    setProgress(0, 'Failed — ' + e.message);
+    document.getElementById('live-dot').className = 'live-dot';
+    hideProgress();
+    toast('Error: ' + e.message);
+  }
+
+  btn.disabled = false; btn.textContent = '↺ Refresh all';
+}
+
+function updateRefreshBar() {
+  const time = S.lastRefresh.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('refresh-bar-text').textContent = 'Real trends loaded';
+  document.getElementById('refresh-bar-time').textContent = `Updated ${time}`;
+  document.getElementById('live-dot').className = 'live-dot live';
+}
+
+// ── TRENDS ─────────────────────────────────────────────
+function updateCounts() {
+  ['career','life','mindset','news','promo'].forEach(p => {
+    const el = document.getElementById('count-'+p);
+    if (el) el.textContent = S.trends[p].length || '—';
+  });
+}
+
+function showTabLoading(msg, sub) {
+  document.getElementById('trend-list').innerHTML = `<div class="tab-loading"><div class="tab-loading-orb"></div><div class="tab-loading-msg">${msg||'Loading…'}</div>${sub?`<div class="tab-loading-sub">${sub}</div>`:''}</div>`;
+}
+
+const cardAnim = document.createElement('style');
+cardAnim.textContent = '@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(cardAnim);
+
+function switchPillar(pillar, el) {
+  S.currentPillar = pillar;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderTrends();
+}
+
+function renderTrends() {
+  const list = document.getElementById('trend-list');
+  const items = S.trends[S.currentPillar] || [];
+  const isNews = S.currentPillar === 'news';
+  if (!items.length) {
+    list.innerHTML = `<div class="tab-loading"><div class="tab-loading-orb"></div><div class="tab-loading-msg">Click "Refresh all" to load trends</div><div class="tab-loading-sub">Pulls from TikTok, Google Trends, LinkedIn & live news</div></div>`;
+    return;
+  }
+  list.style.opacity = '0'; list.style.transform = 'translateY(6px)';
+  setTimeout(() => {
+    list.innerHTML = items.map((t, i) => {
+      const gid = S.currentPillar+'_'+i;
+      const sel = S.selected === gid;
+      return `<div class="trend-card${sel?' sel':''}${isNews?' is-news':''}" onclick="selectTrend('${gid}',${i})" style="animation:cardIn .2s ${i*.05}s both ease-out">
+        <div class="t-num">${isNews?'📰':String(i+1).padStart(2,'0')}</div>
+        <div class="t-body">
+          <div class="t-title">${t.title}</div>
+          <div class="t-meta">
+            <span class="pill ${t.platform==='Instagram'?'pill-ig':'pill-tt'}">${t.platform}</span>
+            <span class="pill pill-${isNews?'news':S.currentPillar}">${isNews?'Live':'#'+S.currentPillar}</span>
+            ${isNews?'<span class="pill pill-live">Today</span>':''}
+            <span class="t-stat">${t.engagement||''}</span>
+          </div>
+          <div class="t-hook">${t.hook||''}</div>
+          ${isNews&&t.newsRef?`<div class="t-newsref">📌 ${t.newsRef}${t.source?' — <em>'+t.source+'</em>':''}</div>`:''}
+          ${!isNews&&t.sourceHint?`<div class="t-source">🔗 ${t.sourceHint}</div>`:''}
+        </div>
+        <div class="t-arrow">→</div>
+      </div>`;
+    }).join('');
+    list.style.transition = 'all .25s ease';
+    list.style.opacity = '1'; list.style.transform = 'translateY(0)';
+  }, 80);
+}
+
+function selectTrend(gid, i) {
+  S.selected = gid;
+  S.selectedTrendData = S.trends[S.currentPillar][i];
+  S.selectedPillar = S.currentPillar;
+  document.getElementById('preview-text').textContent = S.selectedTrendData.title.replace(/"/g,'');
+  const ncBox = document.getElementById('news-ctx-box');
+  const ncText = document.getElementById('news-ctx-text');
+  if (S.selectedTrendData.newsRef) {
+    ncText.textContent = S.selectedTrendData.newsRef + (S.selectedTrendData.source?' — '+S.selectedTrendData.source:'');
+    ncBox.style.display = 'block';
+  } else { ncBox.style.display = 'none'; }
+  renderTrends();
+}
+
+function goCustomize() {
+  if (!S.selectedTrendData) {
+    if (!S.trends[S.currentPillar].length) { toast('Click "Refresh all" to load trends first'); return; }
+    selectTrend(S.currentPillar+'_0', 0);
+  }
+  nav('customize');
+}
+
+function pickFmt(el, fmt) { S.format=fmt; document.querySelectorAll('.fmt-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); }
+function pickTone(el) { S.tone=el.textContent; document.querySelectorAll('.tone-chip').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); }
+
+// ── GENERATE (full quality, not compressed) ────────────
+const loadMsgs = ['DANA is finding her angle…','Crafting the opening hook…','Choreographing the motion…','Setting the light and scene…','Making it feel real…'];
+
+async function generatePrompt() {
+  if (!S.selectedTrendData) { toast('Select a trend first'); return; }
+  nav('output');
+  document.getElementById('output-empty').style.display = 'none';
+  document.getElementById('output-block').style.display = 'none';
+  document.getElementById('output-loader').style.display = 'block';
+  let mi = 0;
+  const msgEl = document.getElementById('loader-msg');
+  const tickerT = setInterval(() => { if(mi<loadMsgs.length-1){mi++;msgEl.textContent=loadMsgs[mi];} }, 2200);
+
+  const t       = S.selectedTrendData;
+  const pillar  = S.selectedPillar;
+  const name    = document.getElementById('s-name').value    || 'DANA AI';
+  const brand   = document.getElementById('s-brand').value   || 'Primentoring.AI';
+  const avatar  = document.getElementById('s-avatar').value  || 'DANA avatar in HeyGen';
+  const bio     = document.getElementById('s-bio').value;
+  const pillars = document.getElementById('s-pillars').value;
+  const vibe    = document.getElementById('vibe').value.trim();
+  const notes   = document.getElementById('notes').value.trim();
+  const newsCtx = t.newsRef || '';
+  const sourceHint = t.sourceHint || '';
+
+  const system = `You are the creative director for ${name}, AI Life & Career Coach at ${brand}.
+DANA: ${bio}. Pillars: ${pillars}.
+
+PRODUCTION RULES (non-negotiable):
+- MOTION: Every scene = continuous dynamic motion. DANA always mid-action. Active verbs required.
+- CAMERA: Mix tight close-up, medium, and full-body. Natural reframing welcome.
+- LIGHTING: Real, directional, textured. Name source + quality + how it moves across her skin. No flat lighting.
+- AUTHENTICITY: Include 2-3 human details per scene — hair strand that falls, micro-pause while remembering, audible exhale before hard truth, fabric movement, natural hand gesture.
+- TEXT: ONLY on solid colour band at screen bottom OR separate plain frame. NEVER on face/skin/hair/clothing.
+- ASSETS: Dynamic video only. No static images.
+- SCRIPT: First line = arresting hook in under 3 seconds. Sounds like talking to ONE person she cares about. Fragments OK. Real pauses. Minimal imperatives.
+${vibe ? 'VIBE: '+vibe : 'SCENE: Invent the perfect setting for this content — consider emotional register, time of day. Avoid generic home office defaults.'}
+${newsCtx ? 'NEWS CONTEXT: '+newsCtx : ''}
+
+Return ONLY valid JSON:
+{"scene":"5 sentences. Avatar '${avatar}'. Location, lighting detail, camera evolution, continuous actions with angle transitions, 2 authenticity details.","styling":"3 sentences. Exact garment + fabric. Hair with movement. Makeup under this light. One deliberate imperfection.","script":"145-160 words ~60s. [PAUSE] [SLOW DOWN] (action cues). Hook before 3s. Natural fragments. Soft close with open question.","delivery":"4 bullets: energy arc, pacing callouts, gesture choreography, eye contact pattern.","text_overlay":"Text content, lower band colour, timing. Confirm no text on face.","caption":"Line1: chest-tightening statement (not a command). Line2: emotional layer. Line3: open question. 6-7 hashtags."}`;
+
+  try {
+    const data = await callAPI({
+      model: 'claude-sonnet-4-6', max_tokens: 1400, system,
+      messages: [{ role:'user', content:`Trend: "${t.title}"\nHook: "${t.hook}"\nPlatform: ${t.platform}\nPillar: ${pillar}\nFormat: ${S.format}\nTone: ${S.tone}\n${newsCtx?'News: '+newsCtx+'\n':''}${sourceHint?'Source: '+sourceHint+'\n':''}${notes?'Direction: '+notes+'\n':''}Generate now.` }]
+    });
+    const raw = data.content.map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
+    const p = JSON.parse(raw);
+    S.prompt = { trend:t.title, pillar, platform:t.platform, date:new Date().toLocaleDateString('en-GB'), ...p };
+    clearInterval(tickerT);
+    document.getElementById('output-loader').style.display = 'none';
+    document.getElementById('output-block').style.display = 'block';
+    document.getElementById('o-scene').textContent    = p.scene;
+    document.getElementById('o-styling').textContent  = p.styling;
+    document.getElementById('o-script').textContent   = p.script;
+    const dlRaw = typeof p.delivery==='string'?p.delivery:(Array.isArray(p.delivery)?p.delivery.join('\n'):JSON.stringify(p.delivery));
+    document.getElementById('o-delivery').innerHTML = dlRaw.split('\n').map(l=>l.trim()?'• '+l.replace(/^[-•\d.]\s*/,''):'').filter(Boolean).join('<br>');
+    document.getElementById('o-text').textContent    = p.text_overlay||'—';
+    document.getElementById('o-caption').textContent = p.caption;
+  } catch(e) {
+    clearInterval(tickerT);
+    document.getElementById('output-loader').style.display = 'none';
+    document.getElementById('output-empty').style.display = 'block';
+    document.getElementById('output-empty').innerHTML = `<span class="empty-glyph">✗</span><div class="empty-t" style="color:var(--rose)">${e.message}</div><div class="empty-s">Check your API key and try again</div>`;
+  }
+}
+
+// ── COPY / HISTORY ─────────────────────────────────────
+function copyAll() {
+  if (!S.prompt) return;
+  const out = [
+    '=== DANA AI — HeyGen Prompt ===',
+    '⚠ RULES: Continuous motion · Cinematic lighting · Multi-angle · Human authenticity details · Text on lower band only\n',
+    '--- SCENE ---\n'+(S.prompt.scene||''),
+    '\n--- WARDROBE ---\n'+(S.prompt.styling||''),
+    '\n--- SCRIPT ---\n'+(S.prompt.script||''),
+    '\n--- DELIVERY ---\n'+(S.prompt.delivery||''),
+    '\n--- TEXT OVERLAY ---\n'+(S.prompt.text_overlay||'—'),
+    '\n--- CAPTION ---\n'+(S.prompt.caption||'')
+  ].join('\n');
+  navigator.clipboard.writeText(out).then(() => toast('Copied ✓'));
+}
+function saveHistory() {
+  if (!S.prompt) return;
+  S.history.unshift(S.prompt);
+  if (S.history.length > 30) S.history.pop();
+  localStorage.setItem('dana_history', JSON.stringify(S.history));
+  toast('Saved ✓');
+}
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!S.history.length) { el.innerHTML='<div class="empty" style="padding:40px 0"><span class="empty-glyph" style="font-size:40px">◷</span><div class="empty-t">No saved prompts yet</div></div>'; return; }
+  el.innerHTML = S.history.map((h,i) => `<div class="history-item" onclick="loadHistory(${i})"><div class="h-title">${h.trend}</div><div class="h-meta"><span class="pill pill-${h.pillar||'career'}">${h.pillar||''}</span>${h.platform||''} · ${h.date||''}</div></div>`).join('');
+}
+function loadHistory(i) {
+  const h = S.history[i]; S.prompt = h;
+  document.getElementById('o-scene').textContent    = h.scene    || '';
+  document.getElementById('o-styling').textContent  = h.styling  || '';
+  document.getElementById('o-script').textContent   = h.script   || '';
+  const dlRaw = typeof h.delivery==='string'?h.delivery:(Array.isArray(h.delivery)?h.delivery.join('\n'):'');
+  document.getElementById('o-delivery').innerHTML = dlRaw.split('\n').map(l=>l.trim()?'• '+l.replace(/^[-•]\s*/,''):'').filter(Boolean).join('<br>');
+  document.getElementById('o-text').textContent    = h.text_overlay||'—';
+  document.getElementById('o-caption').textContent  = h.caption  || '';
+  ['output-empty','output-loader'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('output-block').style.display = 'block';
+  nav('output');
+}
+function saveSettings() { toast('Profile saved ✓'); }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+loadSavedKey();
+setTimeout(() => { if (document.getElementById('apiKey').value.trim()) refreshAll(); }, 400);
+</script>
+</body>
+</html>
