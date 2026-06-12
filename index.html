@@ -101,7 +101,7 @@ body::after{width:450px;height:450px;background:radial-gradient(circle,rgba(168,
 .ftab.active{font-weight:600;background:linear-gradient(135deg,rgba(255,255,255,.85),rgba(255,255,255,.55));box-shadow:0 2px 10px rgba(107,79,160,.12),inset 0 1px 1px rgba(255,255,255,.8)}
 .ftab.active.career{color:var(--purple-deep)}.ftab.active.life{color:var(--teal)}
 .ftab.active.mindset{color:var(--amber)}.ftab.active.news{color:var(--green)}
-.ftab.active.tech{color:#2860B0}.ftab.active.finance{color:#9A6510}
+.ftab.active.askdana{color:var(--rose)}
 .ftab-icon{font-size:15px}
 .ftab-count{font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;background:rgba(255,255,255,.5);color:var(--ink-muted)}
 .ftab.active .ftab-count{background:rgba(139,111,192,.2);color:var(--purple-deep)}
@@ -130,8 +130,7 @@ body::after{width:450px;height:450px;background:radial-gradient(circle,rgba(168,
 .pill-life{background:rgba(45,138,124,.12);color:var(--teal)}
 .pill-mindset{background:rgba(184,114,10,.12);color:var(--amber)}
 .pill-news{background:rgba(45,122,74,.12);color:var(--green);border:1px solid rgba(45,122,74,.2)}
-.pill-tech{background:rgba(40,96,176,.12);color:#2860B0}
-.pill-finance{background:rgba(154,101,16,.12);color:#9A6510}
+.pill-askdana{background:rgba(168,64,96,.12);color:var(--rose);border:1px solid rgba(168,64,96,.2)}
 .pill-live{background:rgba(154,52,18,.1);color:#9A3412;border:1px solid rgba(154,52,18,.2)}
 .t-stat{font-size:11px;color:var(--ink-faint)}
 .t-actions{display:flex;flex-direction:column;gap:6px;align-self:center}
@@ -243,7 +242,7 @@ textarea{resize:vertical;min-height:88px;line-height:1.65}
       <div class="page-hero">
         <div class="page-eyebrow">Step 01</div>
         <div class="page-title">Trend <em>Radar</em></div>
-        <div class="page-sub">Refreshes from real sources — TikTok, Google Trends, LinkedIn and live news across career, tech and finance. Tap ✦ on any card for a Primentoring version.</div>
+        <div class="page-sub">Refreshes from real sources across career, life, mindset and live news — plus Ask DANA Q&amp;A content. Tap ✦ on any card for a Primentoring version.</div>
       </div>
       <div class="page-body">
         <div class="sources-strip glass">
@@ -268,14 +267,13 @@ textarea{resize:vertical;min-height:88px;line-height:1.65}
           <div class="ftab life" onclick="switchPillar('life',this)"><span class="ftab-icon">🌿</span> Life <span class="ftab-count" id="count-life">—</span></div>
           <div class="ftab mindset" onclick="switchPillar('mindset',this)"><span class="ftab-icon">🧠</span> Mindset <span class="ftab-count" id="count-mindset">—</span></div>
           <div class="ftab news" onclick="switchPillar('news',this)"><span class="ftab-icon">📰</span> News <span class="ftab-count" id="count-news">—</span></div>
-          <div class="ftab tech" onclick="switchPillar('tech',this)"><span class="ftab-icon">⚡</span> Tech <span class="ftab-count" id="count-tech">—</span></div>
-          <div class="ftab finance" onclick="switchPillar('finance',this)"><span class="ftab-icon">📈</span> Finance <span class="ftab-count" id="count-finance">—</span></div>
+          <div class="ftab askdana" onclick="switchPillar('askdana',this)"><span class="ftab-icon">💬</span> Ask DANA <span class="ftab-count" id="count-askdana">—</span></div>
         </div>
         <div class="trend-grid" id="trend-list">
           <div class="tab-loading">
             <div class="tab-loading-orb"></div>
             <div class="tab-loading-msg">Click "Refresh all" to load today's real trends</div>
-            <div class="tab-loading-sub">TikTok · Google Trends · LinkedIn · Live News · Tech · Finance</div>
+            <div class="tab-loading-sub">TikTok · Google Trends · LinkedIn · Live News · Ask DANA</div>
           </div>
         </div>
         <div class="btn-row"><button class="btn-primary" onclick="goCustomize()">Customize selected →</button></div>
@@ -468,17 +466,13 @@ var FALLBACK = {
     {title:"The EU just changed how your boss can use AI on you",platform:"TikTok",engagement:"Trending",hook:"If your company uses AI to evaluate you, new rules just kicked in.",pillar:"news",newsRef:"EU AI Act: workplace AI now classified high risk",source:"Gloat"},
     {title:"LinkedIn named the number one job of 2026",platform:"Instagram",engagement:"Trending",hook:"The fastest-growing job title did not exist five years ago.",pillar:"news",newsRef:"LinkedIn: AI Engineer up 143% year-over-year",source:"LinkedIn"}
   ],
-  tech: [
-    {title:"The AI tool quietly replacing entry-level work",platform:"TikTok",engagement:"Trending",hook:"It is not coming for your job. It already changed what your job is.",pillar:"tech",newsRef:"AI agents adoption accelerating across knowledge work",source:"Tech news"},
-    {title:"Why every company suddenly wants an AI strategy",platform:"Instagram",engagement:"Trending",hook:"The ones who waited are now scrambling. Here is what that means for you.",pillar:"tech",newsRef:"Enterprise AI spend surging in 2026",source:"Tech news"},
-    {title:"The skill that future-proofs you against automation",platform:"TikTok",engagement:"Trending",hook:"It is not coding. It is something machines still cannot do.",pillar:"tech",newsRef:"Human skills premium rising as AI commoditises technical work",source:"Tech news"},
-    {title:"What the new AI regulations mean for your career",platform:"Instagram",engagement:"Trending",hook:"Most people will not read the policy. You do not have to.",pillar:"tech",newsRef:"Global AI workplace regulation tightening 2026",source:"Tech news"}
-  ],
-  finance: [
-    {title:"The money move I wish I made at 25",platform:"TikTok",engagement:"Trending",hook:"Nobody explained this to me. So I am explaining it to you.",pillar:"finance",newsRef:"Financial literacy gap among young professionals",source:"Finance news"},
-    {title:"Why your raise is not keeping up and what to do",platform:"Instagram",engagement:"Trending",hook:"The number went up. Your buying power went down. Let us talk.",pillar:"finance",newsRef:"Wage growth versus inflation 2026",source:"Finance news"},
-    {title:"The quiet wealth habit of high earners",platform:"TikTok",engagement:"Trending",hook:"It is not what they earn. It is what they decided to automate.",pillar:"finance",newsRef:"Automated investing trends rising",source:"Finance news"},
-    {title:"Negotiating equity — the part nobody teaches women",platform:"Instagram",engagement:"Trending",hook:"Salary is the conversation. Equity is where the real gap hides.",pillar:"finance",newsRef:"Gender equity gap in startup compensation",source:"Finance news"}
+  askdana: [
+    {title:"How do I ask for a raise when I already feel underpaid?",platform:"TikTok",engagement:"Q&A",hook:"Stop opening with an apology. Here is what to say instead.",pillar:"askdana",question:"How do I ask for a raise when I already feel underpaid?",answerAngle:"Reframe from asking a favour to stating your value; lead with impact, not need"},
+    {title:"Is it too late to switch careers at 35?",platform:"Instagram",engagement:"Q&A",hook:"I made my biggest pivot at 34. Let me tell you what nobody warns you about.",pillar:"askdana",question:"Is it too late to switch careers at 35?",answerAngle:"Share DANA own pivot; the real cost is staying, not switching"},
+    {title:"How do I deal with a manager who takes credit for my work?",platform:"TikTok",engagement:"Q&A",hook:"You do not need to confront them. You need to do this one quiet thing.",pillar:"askdana",question:"How do I handle a manager taking credit for my work?",answerAngle:"Document and create visibility upward, not conflict sideways"},
+    {title:"How do I stop feeling like a fraud at work?",platform:"Instagram",engagement:"Q&A",hook:"Imposter syndrome is not a flaw. It is a signal you are misreading.",pillar:"askdana",question:"How do I stop feeling like a fraud at work?",answerAngle:"Reframe imposter feelings as growth-edge, not unworthiness"},
+    {title:"Should I quit without another job lined up?",platform:"TikTok",engagement:"Q&A",hook:"Everyone says never quit without a backup. I disagree, and here is when.",pillar:"askdana",question:"Should I quit without another job lined up?",answerAngle:"Honest nuance: when staying costs more than the safety of a backup"},
+    {title:"How do I set boundaries without seeming difficult?",platform:"Instagram",engagement:"Q&A",hook:"The fear of being called difficult is keeping you over-committed.",pillar:"askdana",question:"How do I set boundaries without seeming difficult?",answerAngle:"Boundaries stated calmly read as confidence, not conflict"}
   ]
 };
 
@@ -489,7 +483,7 @@ var S = {
   tone:'Auto', isPromoMode:false,
   prompt:null,
   history:JSON.parse(localStorage.getItem('dana_history')||'[]'),
-  trends:{career:[],life:[],mindset:[],news:[],tech:[],finance:[]},
+  trends:{career:[],life:[],mindset:[],news:[],askdana:[]},
   lastRefresh:null
 };
 
@@ -562,23 +556,30 @@ async function refreshAll(){
     }catch(e2){console.warn('Step2:',e2.message);S.trends.career=FALLBACK.career;S.trends.life=FALLBACK.life;S.trends.mindset=FALLBACK.mindset;}
     updateCounts();renderTrends();
 
-    // STEP 3: news + tech + finance, with rotating angles for variety
-    setProgress(58,'Fetching live news, tech and finance...');
+    // STEP 3: news — 8 items, mixed angles (AI, career, tech, finance, economy)
+    setProgress(55,'Fetching live news...');
     activateSrc('src-news');
     await sleep(12000);
     try{
-      var angles=pickAngles(3);
-      var r3=await callAPI({model:'claude-sonnet-4-6',max_tokens:1100,
+      var angles=pickAngles(5);
+      var r3=await callAPI({model:'claude-sonnet-4-6',max_tokens:1300,
         tools:[{type:'web_search_20250305',name:'web_search'}],
-        system:'Search current news and return ONLY JSON: {"news":[...],"tech":[...],"finance":[...]}. Each array 4 objects: {"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"source":string}. title = social-media headline DANA would use, not the original. hook = 1 arresting line. newsRef = key fact. news = general AI/career news, tech = technology and AI industry, finance = money/economy/investing for professionals. No markdown.',
-        messages:[{role:'user',content:'Search for fresh news from '+today+' on these angles: '+angles.join('; ')+'. Also search general tech industry news and finance/economy news relevant to working professionals. Give 4 news, 4 tech, 4 finance content ideas for DANA. Make them varied and specific to what you find today.'}]});
-      var p3=safeParseObject(extractText(r3.content));
-      if(p3){
-        S.trends.news=(p3.news&&p3.news.length)?p3.news.map(function(x){x.pillar='news';return x;}):FALLBACK.news;
-        S.trends.tech=(p3.tech&&p3.tech.length)?p3.tech.map(function(x){x.pillar='tech';return x;}):FALLBACK.tech;
-        S.trends.finance=(p3.finance&&p3.finance.length)?p3.finance.map(function(x){x.pillar='finance';return x;}):FALLBACK.finance;
-      }else{S.trends.news=FALLBACK.news;S.trends.tech=FALLBACK.tech;S.trends.finance=FALLBACK.finance;}
-    }catch(e3){console.warn('Step3:',e3.message);S.trends.news=FALLBACK.news;S.trends.tech=FALLBACK.tech;S.trends.finance=FALLBACK.finance;}
+        system:'Search current news and return ONLY JSON array of 8 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Trending","hook":string,"newsRef":string,"source":string}]. title = social-media headline DANA would use, not the original. hook = 1 arresting line. newsRef = key fact. Mix angles across AI, careers, tech industry, finance/economy, and workplace. No markdown.',
+        messages:[{role:'user',content:'Search for 8 fresh, varied news stories from '+today+' across these angles: '+angles.join('; ')+'. Include a mix of AI, tech industry, finance/economy, and workplace stories relevant to ambitious women professionals. Make each specific to what you actually find today.'}]});
+      var p3=safeParseArray(extractText(r3.content));
+      S.trends.news=(Array.isArray(p3)&&p3.length)?p3.map(function(x){x.pillar='news';return x;}):FALLBACK.news;
+    }catch(e3){console.warn('Step3:',e3.message);S.trends.news=FALLBACK.news;}
+
+    // STEP 4: Ask DANA — generate fresh common questions
+    setProgress(78,'Generating Ask DANA questions...');
+    await sleep(12000);
+    try{
+      var r4=await callAPI({model:'claude-sonnet-4-6',max_tokens:900,
+        system:'Generate the most common, real questions ambitious women ask a career and life coach. Return ONLY JSON array of 6 objects: [{"title":string,"platform":"TikTok"|"Instagram","engagement":"Q&A","hook":string,"pillar":"askdana","question":string,"answerAngle":string}]. title = the question itself, concise, one line. hook = 1 arresting opening line DANA would use to answer. question = the clean question. answerAngle = 1 short phrase on DANA distinctive take. Make questions specific and emotionally real, not generic. No markdown.',
+        messages:[{role:'user',content:'Generate 6 fresh, real questions women 25-45 actually ask about career, money, confidence, boundaries, transitions. Each with DANA distinctive answer angle. Keep questions punchy and specific.'}]});
+      var p4=safeParseArray(extractText(r4.content));
+      S.trends.askdana=(Array.isArray(p4)&&p4.length)?p4.map(function(x){x.pillar='askdana';return x;}):FALLBACK.askdana;
+    }catch(e4){console.warn('Step4:',e4.message);S.trends.askdana=FALLBACK.askdana;}
 
     setProgress(100,'All trends loaded');
     S.lastRefresh=new Date();
@@ -591,7 +592,7 @@ async function refreshAll(){
 function updateRefreshBar(){var time=S.lastRefresh.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});document.getElementById('refresh-bar-text').textContent='Trends loaded';document.getElementById('refresh-bar-time').textContent='Updated '+time;document.getElementById('live-dot').className='live-dot live';}
 
 // ── TRENDS ────────────────────────────────────────────────────────
-function updateCounts(){['career','life','mindset','news','tech','finance'].forEach(function(p){var el=document.getElementById('count-'+p);if(el)el.textContent=S.trends[p].length||'—';});}
+function updateCounts(){['career','life','mindset','news','askdana'].forEach(function(p){var el=document.getElementById('count-'+p);if(el)el.textContent=S.trends[p].length||'—';});}
 function showTabLoading(msg,sub){document.getElementById('trend-list').innerHTML='<div class="tab-loading"><div class="tab-loading-orb"></div><div class="tab-loading-msg">'+(msg||'Loading...')+'</div>'+(sub?'<div class="tab-loading-sub">'+sub+'</div>':'')+'</div>';}
 var cardAnimStyle=document.createElement('style');cardAnimStyle.textContent='@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}';document.head.appendChild(cardAnimStyle);
 function switchPillar(pillar,el){S.currentPillar=pillar;document.querySelectorAll('.ftab').forEach(function(t){t.classList.remove('active');});el.classList.add('active');renderTrends();}
@@ -600,18 +601,20 @@ function renderTrends(){
   var list=document.getElementById('trend-list');
   var items=S.trends[S.currentPillar]||[];
   var pillar=S.currentPillar;
-  var isNewsType=(pillar==='news'||pillar==='tech'||pillar==='finance');
+  var isNewsType=(pillar==='news');
+  var isAskType=(pillar==='askdana');
   if(!items.length){list.innerHTML='<div class="tab-loading"><div class="tab-loading-orb"></div><div class="tab-loading-msg">Click Refresh all to load trends</div><div class="tab-loading-sub">Pulls from real sources</div></div>';return;}
   list.style.opacity='0';list.style.transform='translateY(6px)';
   setTimeout(function(){
     list.innerHTML=items.map(function(t,i){
       var gid=pillar+'_'+i, sel=S.selected===gid;
       var newsRef=(isNewsType&&t.newsRef)?'<div class="t-newsref">📌 '+t.newsRef+(t.source?' — '+t.source:'')+'</div>':'';
-      var srcHint=(!isNewsType&&t.sourceHint)?'<div class="t-source">🔗 '+t.sourceHint+'</div>':'';
-      var pillClass=isNewsType?pillar:pillar;
-      var pillLabel=isNewsType?(pillar.charAt(0).toUpperCase()+pillar.slice(1)):('#'+pillar);
+      var answerHint=(isAskType&&t.answerAngle)?'<div class="t-source">💡 DANA angle: '+t.answerAngle+'</div>':'';
+      var srcHint=(!isNewsType&&!isAskType&&t.sourceHint)?'<div class="t-source">🔗 '+t.sourceHint+'</div>':'';
+      var pillClass=pillar;
+      var pillLabel=isNewsType?'News':(isAskType?'Q&A':('#'+pillar));
       return '<div class="trend-card'+(sel?' sel':'')+'" onclick="selectTrend(\''+gid+'\','+i+',false)" style="animation:cardIn .2s '+(i*.05)+'s both ease-out">'+
-        '<div class="t-num">'+(isNewsType?'📰':String(i+1).padStart(2,'0'))+'</div>'+
+        '<div class="t-num">'+(isNewsType?'📰':(isAskType?'💬':String(i+1).padStart(2,'0')))+'</div>'+
         '<div class="t-body">'+
           '<div class="t-title">'+t.title+'</div>'+
           '<div class="t-meta">'+
@@ -621,7 +624,7 @@ function renderTrends(){
             '<span class="t-stat">'+(t.engagement||'')+'</span>'+
           '</div>'+
           '<div class="t-hook">'+(t.hook||'')+'</div>'+
-          newsRef+srcHint+
+          newsRef+answerHint+srcHint+
         '</div>'+
         '<div class="t-actions">'+
           '<button class="promo-btn" onclick="event.stopPropagation();selectTrend(\''+gid+'\','+i+',true)">✦ Primentoring</button>'+
@@ -674,12 +677,19 @@ async function generatePrompt(){
   var notes=document.getElementById('notes').value.trim();
   var newsCtx=t.newsRef||'';
   var promo=S.isPromoMode;
+  var isAsk=(pillar==='askdana');
+  var askQuestion=t.question||'';
+  var askAngle=t.answerAngle||'';
 
   var toneLine = S.tone==='Auto'
     ? 'TONE: Read the content and choose the voice that fits it best — vulnerable for an emotional topic, bold for an empowerment piece, playful for something light, expert for a data-driven angle. Let the subject decide the register.'
     : 'TONE: '+S.tone+'.';
 
   var sceneDir = vibe ? 'VIBE DIRECTION: '+vibe : 'SCENE: Invent the perfect setting for this content. Consider emotional register and time of day. Avoid generic home-office defaults.';
+
+  var askBlock = isAsk
+    ? '\nQ&A FORMAT (required): This is an Ask DANA piece. The video opens with DANA reading or paraphrasing this real question from her audience: "'+askQuestion+'". Then she answers it directly, warmly, and specifically. Her distinctive angle: '+askAngle+'. The script should feel like she is talking to one person who sent this question — acknowledge the feeling behind it first, then give a real, non-generic answer with one concrete takeaway. The on-screen text overlay should show the question at the start.'
+    : '';
 
   var promoBlock = promo
     ? '\nPRIMENTORING INTEGRATION (required): This is a Primentoring.AI branded piece. Weave in the value of Primentoring.AI elite mentorship naturally — 100+ vetted mentors from Google, Apple, Meta, Amazon and NASA, plus a 24/7 AI mentor, 97% client satisfaction across 130 countries. Do NOT make it feel like a hard ad — DANA reacts to the topic first, then connects it to why having a world-class mentor changes the outcome. End the script and the caption with a soft call to action to visit www.primentoring.ai.'
@@ -699,11 +709,12 @@ async function generatePrompt(){
     '- SCRIPT: First line = arresting hook in under 3 seconds. Sounds like talking to one person. Natural fragments OK. Minimal imperatives.\n'+
     toneLine+'\n'+sceneDir+'\n'+
     (newsCtx?'NEWS CONTEXT (weave in naturally): '+newsCtx+'\n':'')+
+    askBlock+
     promoBlock+'\n\n'+
     'Return ONLY valid JSON:\n'+
     '{"scene":"5-6 sentences. Avatar name, location, lighting detail, camera evolution with angle transitions, continuous actions, 2 authenticity details.","styling":"3 sentences. Exact garment and fabric. Hair with movement. Makeup under this light. One deliberate imperfection.","script":"145-160 words ~60s. [PAUSE] [SLOW DOWN] (action cues). Hook before 3s. Natural fragments. Soft close.","delivery":"4 bullets: energy arc, pacing callouts, gesture choreography, eye contact pattern.","text_overlay":"Text content, lower band colour, timing. Confirm no text on face.","caption":"Line1: chest-tightening statement not a command. Line2: emotional layer. Line3: open question or soft invitation. 6-7 hashtags."}';
 
-  var userMsg='Trend: '+t.title+'\nHook: '+t.hook+'\nPlatform: '+t.platform+'\nPillar: '+pillar+'\nFormat: '+S.format+
+  var userMsg=(isAsk?'Audience question: '+askQuestion+'\n':'Trend: '+t.title+'\n')+'Hook: '+t.hook+'\nPlatform: '+t.platform+'\nPillar: '+pillar+'\nFormat: '+S.format+
     (newsCtx?'\nNews: '+newsCtx:'')+(notes?'\nDirection: '+notes:'')+(promo?'\nThis is a Primentoring.AI branded piece.':'')+'\nGenerate now.';
 
   try{
@@ -750,7 +761,7 @@ function toast(msg){var el=document.getElementById('toast');el.textContent=msg;e
 
 // ── INIT ──────────────────────────────────────────────────────────
 loadSavedKey();
-S.trends={career:FALLBACK.career.slice(),life:FALLBACK.life.slice(),mindset:FALLBACK.mindset.slice(),news:FALLBACK.news.slice(),tech:FALLBACK.tech.slice(),finance:FALLBACK.finance.slice()};
+S.trends={career:FALLBACK.career.slice(),life:FALLBACK.life.slice(),mindset:FALLBACK.mindset.slice(),news:FALLBACK.news.slice(),askdana:FALLBACK.askdana.slice()};
 updateCounts();renderTrends();
 setTimeout(function(){if(document.getElementById('apiKey').value.trim())refreshAll();},500);
 </script>
